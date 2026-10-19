@@ -13,10 +13,13 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Spinner } from "@/components/ui/spinner";
+import { useRetryCountdown } from "@/hooks/use-retry-countdown";
+import { RetryNotice } from "@/components/auth/retry-notice";
 
 export function LoginForm({ next }: { next?: string }) {
   const [pending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string | null>(null);
+  const retry = useRetryCountdown("login");
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -27,6 +30,11 @@ export function LoginForm({ next }: { next?: string }) {
     startTransition(async () => {
       const result = await signInAction(values, next);
       if (result && !result.ok) {
+        if (result.retryAfterSeconds) {
+          retry.start(result.retryAfterSeconds);
+          setFormError(result.error);
+          return;
+        }
         setFormError(result.error);
         toast.error(result.error);
       }
@@ -36,7 +44,9 @@ export function LoginForm({ next }: { next?: string }) {
   return (
     <form onSubmit={onSubmit} noValidate aria-busy={pending}>
       <FieldGroup>
-        {formError ? (
+        {retry.active ? (
+          <RetryNotice message={formError ?? "Too many attempts."} remaining={retry.remaining} />
+        ) : formError ? (
           <Alert variant="destructive">
             <AlertDescription>{formError}</AlertDescription>
           </Alert>
@@ -56,9 +66,9 @@ export function LoginForm({ next }: { next?: string }) {
           <PasswordInput id="password" autoComplete="current-password" aria-invalid={!!form.formState.errors.password} {...form.register("password")} />
           <FieldError errors={[form.formState.errors.password]} />
         </Field>
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button type="submit" className="w-full" disabled={pending || retry.active}>
           {pending ? <Spinner /> : null}
-          Sign in
+          {retry.active ? "Please wait…" : "Sign in"}
         </Button>
       </FieldGroup>
     </form>

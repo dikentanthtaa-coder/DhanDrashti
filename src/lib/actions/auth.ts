@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, isAdminConfigured } from "@/lib/supabase/admin";
 import { publicEnv } from "@/lib/env";
 import { getCurrentUser } from "@/lib/auth/session";
-import { fail, ok, GENERIC_ERROR, type ActionResult } from "@/lib/actions/result";
+import { fail, ok, rateLimited, GENERIC_ERROR, EMAIL_LIMIT_SECONDS, ATTEMPT_LIMIT_SECONDS, type ActionResult } from "@/lib/actions/result";
 import {
   changePasswordSchema,
   deleteAccountSchema,
@@ -65,9 +65,13 @@ export async function signUpAction(input: unknown): Promise<ActionResult<{ needs
     if (error.code === "email_address_invalid" || error.code === "validation_failed") {
       return fail("Enter a valid, deliverable email address.", { email: ["Enter a valid, deliverable email address."] });
     }
-    if (error.status === 429 || error.code === "over_email_send_rate_limit") {
-      return fail("Too many attempts. Please wait a minute and try again.");
+    if (error.code === "over_email_send_rate_limit") {
+      return rateLimited(
+        "The verification-email limit for this hour has been reached. You can try again when the timer ends.",
+        EMAIL_LIMIT_SECONDS
+      );
     }
+    if (error.status === 429) return rateLimited("Too many attempts. Please wait a minute and try again.", ATTEMPT_LIMIT_SECONDS);
     if (error.code === "signup_disabled") return fail("Sign-ups are currently disabled.");
     if (error.message?.toLowerCase().includes("error sending") || error.code === "unexpected_failure") {
       console.error("signUp: email delivery failed", error.code ?? error.status);
@@ -91,7 +95,7 @@ export async function signInAction(input: unknown, next?: string): Promise<Actio
     if (error.code === "email_not_confirmed") {
       return fail("Please verify your email address first. Check your inbox for the confirmation link.");
     }
-    if (error.status === 429) return fail("Too many attempts. Please wait a minute and try again.");
+    if (error.status === 429) return rateLimited("Too many attempts. Please wait a minute and try again.", ATTEMPT_LIMIT_SECONDS);
     return fail("Invalid email or password.");
   }
   redirect(safeNext(next));
@@ -107,11 +111,15 @@ export async function resendVerificationAction(input: unknown): Promise<ActionRe
   const parsed = forgotPasswordSchema.safeParse(input);
   if (!parsed.success) return fail("Enter a valid email address.", fieldErrors(parsed.error));
   const supabase = await createClient();
-  await supabase.auth.resend({
+  const { error } = await supabase.auth.resend({
     type: "signup",
     email: parsed.data.email,
     options: { emailRedirectTo: `${await siteUrl()}/auth/confirm?next=/dashboard` },
   });
+  if (error?.code === "over_email_send_rate_limit") {
+    return rateLimited("The email limit for this hour has been reached. Try again when the timer ends.", EMAIL_LIMIT_SECONDS);
+  }
+  if (error?.status === 429) return rateLimited("Too many attempts. Please wait a minute and try again.", ATTEMPT_LIMIT_SECONDS);
   return ok(undefined, "If that address needs verification, a new link has been sent.");
 }
 
@@ -123,7 +131,10 @@ export async function forgotPasswordAction(input: unknown): Promise<ActionResult
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${await siteUrl()}/auth/confirm?next=/reset-password`,
   });
-  if (error && error.status === 429) return fail("Too many attempts. Please wait a minute and try again.");
+  if (error?.code === "over_email_send_rate_limit") {
+    return rateLimited("The email limit for this hour has been reached. Try again when the timer ends.", EMAIL_LIMIT_SECONDS);
+  }
+  if (error?.status === 429) return rateLimited("Too many attempts. Please wait a minute and try again.", ATTEMPT_LIMIT_SECONDS);
   // Always generic to avoid account enumeration.
   return ok(undefined, "If an account exists for that email, a reset link is on its way.");
 }

@@ -13,11 +13,14 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Spinner } from "@/components/ui/spinner";
+import { useRetryCountdown } from "@/hooks/use-retry-countdown";
+import { RetryNotice } from "@/components/auth/retry-notice";
 
 export function SignupForm() {
   const [pending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string | null>(null);
   const [sentTo, setSentTo] = React.useState<string | null>(null);
+  const retry = useRetryCountdown("signup");
   const form = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
     defaultValues: { displayName: "", email: "", password: "", confirmPassword: "" },
@@ -32,6 +35,7 @@ export function SignupForm() {
         setSentTo(values.email);
       } else {
         setFormError(result.error);
+        if (result.retryAfterSeconds) retry.start(result.retryAfterSeconds);
         if (result.fieldErrors) {
           for (const [field, messages] of Object.entries(result.fieldErrors)) {
             form.setError(field as keyof SignupInput, { message: messages[0] });
@@ -52,13 +56,15 @@ export function SignupForm() {
           If <span className="font-medium text-foreground">{sentTo}</span> can be registered, we sent a verification link.
           Open it to activate your account.
         </p>
+        {retry.active ? <RetryNotice message="Email limit reached." remaining={retry.remaining} /> : null}
         <Button
           variant="outline"
           size="sm"
-          disabled={pending}
+          disabled={pending || retry.active}
           onClick={() =>
             startTransition(async () => {
               const r = await resendVerificationAction({ email: sentTo });
+              if (!r.ok && r.retryAfterSeconds) retry.start(r.retryAfterSeconds);
               toast(r.ok ? r.message ?? "Sent" : r.error);
             })
           }
@@ -73,7 +79,9 @@ export function SignupForm() {
   return (
     <form onSubmit={onSubmit} noValidate aria-busy={pending}>
       <FieldGroup>
-        {formError ? (
+        {retry.active ? (
+          <RetryNotice message={formError ?? "Too many attempts."} remaining={retry.remaining} />
+        ) : formError ? (
           <Alert variant="destructive">
             <AlertDescription>{formError}</AlertDescription>
           </Alert>
@@ -99,9 +107,9 @@ export function SignupForm() {
           <PasswordInput id="confirmPassword" autoComplete="new-password" aria-invalid={!!errors.confirmPassword} {...form.register("confirmPassword")} />
           <FieldError errors={[errors.confirmPassword]} />
         </Field>
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button type="submit" className="w-full" disabled={pending || retry.active}>
           {pending ? <Spinner /> : null}
-          Create account
+          {retry.active ? "Please wait…" : "Create account"}
         </Button>
       </FieldGroup>
     </form>

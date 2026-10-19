@@ -41,3 +41,20 @@ describe("SignupForm", () => {
     expect(screen.getByText("asha@example.com")).toBeInTheDocument();
   });
 });
+
+describe("SignupForm rate limiting", () => {
+  it("shows a countdown and disables the button when rate limited", async () => {
+    signUpAction.mockResolvedValue({ ok: false, error: "The verification-email limit for this hour has been reached.", retryAfterSeconds: 90 });
+    const user = userEvent.setup();
+    render(<SignupForm />);
+    await user.type(screen.getByLabelText(/your name/i), "Asha");
+    await user.type(screen.getByLabelText(/email/i), "asha@example.com");
+    await user.type(screen.getByLabelText(/^password/i), "paisa-track-2026");
+    await user.type(screen.getByLabelText(/confirm password/i), "paisa-track-2026");
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+    expect(await screen.findByRole("status")).toHaveTextContent(/please wait/i);
+    expect(screen.getByRole("status")).toHaveTextContent(/1:30|1:29/);
+    expect(screen.getByRole("button", { name: /please wait/i })).toBeDisabled();
+    window.localStorage.clear();
+  });
+});
