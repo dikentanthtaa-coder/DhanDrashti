@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const [{ user, profile }, unreadCount] = await Promise.all([requireUserWithProfile(), getUnreadNotificationCount()]);
 
   return (
-    <div className="flex min-h-svh">
+    <div className="flex min-h-svh overflow-x-clip">
       <AppSidebar unreadCount={unreadCount} />
       <div className="flex min-w-0 flex-1 flex-col">
         <DashboardHeader name={profile.display_name} email={user.email ?? ""} unreadCount={unreadCount} />

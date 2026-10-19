@@ -90,7 +90,7 @@ export function SegmentedChoice<T extends string>({
       onValueChange={(v) => onChange(v as T)}
       disabled={disabled}
       aria-label={ariaLabel}
-      className={cn("grid gap-2", cols === 3 && "grid-cols-3", cols === 2 && "grid-cols-2", cols === 1 && "grid-cols-1")}
+      className={cn("grid gap-2", cols === 1 ? "grid-cols-1" : "grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]")}
     >
       {options.map((o) => {
         const id = `${idPrefix}-${o.value}`;
@@ -100,16 +100,20 @@ export function SegmentedChoice<T extends string>({
             key={o.value}
             htmlFor={id}
             className={cn(
-              "flex cursor-pointer items-start gap-2.5 rounded-lg border bg-background px-3 py-2.5 text-sm transition-colors hover:border-ring/60 has-focus-visible:ring-3 has-focus-visible:ring-primary/25",
+              "flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border bg-background px-3 py-2.5 text-sm transition-colors hover:border-ring/60 has-focus-visible:ring-3 has-focus-visible:ring-primary/25",
               active ? (o.activeClassName ?? "border-primary bg-primary/10") : "border-input",
               disabled && "cursor-not-allowed opacity-60"
             )}
           >
             <RadioGroupItem id={id} value={o.value} className="sr-only" />
-            {o.icon ? <span className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center [&_svg]:size-4", active ? "" : "text-muted-foreground")}>{o.icon}</span> : null}
-            <span className="flex min-w-0 flex-col">
-              <span className="font-medium">{o.label}</span>
-              {o.description ? <span className="text-xs text-muted-foreground">{o.description}</span> : null}
+            {o.icon ? (
+              <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4", active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>
+                {o.icon}
+              </span>
+            ) : null}
+            <span className="flex min-w-0 flex-col leading-tight">
+              <span className="truncate font-medium">{o.label}</span>
+              {o.description ? <span className="truncate text-xs text-muted-foreground">{o.description}</span> : null}
             </span>
             {active ? <Check className="ml-auto size-4 shrink-0 self-center" aria-hidden="true" /> : null}
           </label>

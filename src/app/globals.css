@@ -177,12 +177,10 @@
     /* Keep the scrollbar space reserved so content never shifts sideways when a
        page grows/shrinks or a modal locks scrolling. */
     scrollbar-gutter: stable;
-    overflow-y: scroll;
-    /* No elastic bounce in either direction (trackpad / touch) and never a
-       horizontal page scroll — content wider than the screen scrolls inside
-       its own container instead. */
+    /* No elastic bounce in either direction (trackpad / touch). Horizontal
+       clipping lives on the layout wrapper (overflow-x-clip) so html/body stay
+       plain scroll roots and sticky elements keep working while dialogs lock scroll. */
     overscroll-behavior: none;
-    overflow-x: hidden;
   }
   /* Radix/react-remove-scroll pads the body by the scrollbar width while a
      dialog/select is open; with the gutter already reserved that padding would
@@ -197,7 +195,6 @@
   body {
     min-height: 100svh;
     overscroll-behavior: none;
-    overflow-x: clip;
   }
   /* Numeric columns align; hero figures stay proportional. */
   .tabular {
