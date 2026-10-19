@@ -31,6 +31,7 @@ export type ProfileRow = {
   savings_target_type: SavingsTargetType | null;
   savings_target_value: number | null;
   email_alerts_enabled: boolean;
+  avatar_path: string | null;
   created_at: string;
   updated_at: string;
 }

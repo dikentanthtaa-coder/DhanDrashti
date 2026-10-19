@@ -4,6 +4,8 @@ import { isEmailConfigured } from "@/lib/email";
 import { DEFAULT_TIMEZONE } from "@/lib/constants";
 import { PageHeader } from "@/components/common/page-header";
 import { ProfileForm } from "@/components/settings/profile-form";
+import { AvatarUploader } from "@/components/settings/avatar-uploader";
+import { getAvatarUrl } from "@/lib/data/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Profile" };
@@ -20,10 +22,20 @@ function timezoneList(current: string): string[] {
 }
 
 export default async function ProfileSettingsPage() {
-  const { profile } = await requireUserWithProfile();
+  const { user, profile } = await requireUserWithProfile();
+  const avatarUrl = await getAvatarUrl(profile.avatar_path, user.id);
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Profile" description="How DhanDrashti addresses you and interprets dates." />
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle className="text-base">Photo</CardTitle>
+          <CardDescription>Shown in the header. Stored privately; only you can see it.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AvatarUploader name={profile.display_name} avatarUrl={avatarUrl} />
+        </CardContent>
+      </Card>
       <Card className="max-w-2xl">
         <CardHeader>
           <CardTitle className="text-base">Personal details</CardTitle>

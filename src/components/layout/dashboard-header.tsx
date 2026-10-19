@@ -7,7 +7,7 @@ import { APP_NAME } from "@/lib/constants";
 import { BrandLogo } from "@/components/common/brand-logo";
 import { HeaderTitle } from "@/components/layout/header-title";
 
-export function DashboardHeader({ name, email, unreadCount }: { name: string; email: string; unreadCount: number }) {
+export function DashboardHeader({ name, email, unreadCount, avatarUrl }: { name: string; email: string; unreadCount: number; avatarUrl?: string | null }) {
   return (
     <header className="no-print sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-background/90 px-4 backdrop-blur lg:px-8">
       <Link href="/dashboard" className="flex shrink-0 items-center gap-2 font-semibold lg:hidden" aria-label={`${APP_NAME} dashboard`}>
@@ -29,7 +29,7 @@ export function DashboardHeader({ name, email, unreadCount }: { name: string; em
           </Link>
         </Button>
         <ThemeToggle />
-        <UserMenu name={name} email={email} />
+        <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
       </div>
     </header>
   );

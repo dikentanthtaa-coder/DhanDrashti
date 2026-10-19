@@ -61,6 +61,7 @@ function fallbackProfile(user: User): ProfileRow {
     savings_target_type: null,
     savings_target_value: null,
     email_alerts_enabled: false,
+    avatar_path: null,
     created_at: now,
     updated_at: now,
   };

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { LogOut, Settings, Shield, User } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,12 +15,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { initials } from "@/lib/format";
 
-export function UserMenu({ name, email }: { name: string; email: string }) {
+export function UserMenu({ name, email, avatarUrl }: { name: string; email: string; avatarUrl?: string | null }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full" aria-label="Account menu">
           <Avatar className="size-8">
+            {avatarUrl ? <AvatarImage src={avatarUrl} alt="" className="object-cover" /> : null}
             <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">{initials(name || email) || "U"}</AvatarFallback>
           </Avatar>
         </Button>
