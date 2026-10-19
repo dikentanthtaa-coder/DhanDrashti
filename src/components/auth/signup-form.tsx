@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -55,6 +56,13 @@ export function SignupForm() {
         <p className="text-sm text-muted-foreground">
           If <span className="font-medium text-foreground">{sentTo}</span> can be registered, we sent a verification link.
           Open it to activate your account.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          No email after a few minutes? Check your spam folder. If this address is already registered, no email is sent —{" "}
+          <Link href="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+            sign in instead
+          </Link>
+          .
         </p>
         {retry.active ? <RetryNotice message="Email limit reached." remaining={retry.remaining} /> : null}
         <Button
