@@ -36,7 +36,7 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                     "group relative flex items-center gap-5 overflow-hidden rounded-md py-2.5 pr-4 pl-5 text-[15px] font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active
                       ? "bg-gradient-to-r from-primary/30 via-primary/15 to-primary/0 text-primary before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-primary"
-                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      : "text-muted-foreground hover:bg-gradient-to-r hover:from-sidebar-accent hover:via-sidebar-accent/50 hover:to-sidebar-accent/0 hover:text-sidebar-accent-foreground"
                   )}
                 >
                   <item.icon className={cn("size-6", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} strokeWidth={active ? 2.25 : 1.75} aria-hidden="true" />
