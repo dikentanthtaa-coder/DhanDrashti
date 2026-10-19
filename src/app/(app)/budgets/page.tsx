@@ -35,6 +35,7 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
+        showDescription
         title="Budgets"
         description="Monthly limits for overall spending and individual categories."
         actions={

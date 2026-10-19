@@ -45,7 +45,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Reports" description={`${rangeLabel} · ${report.days} day${report.days === 1 ? "" : "s"}`} actions={<ReportExportMenu />} />
+      <PageHeader title="Reports" showDescription description={`${rangeLabel} · ${report.days} day${report.days === 1 ? "" : "s"}`} actions={<ReportExportMenu />} />
 
       <section className="no-print flex flex-col gap-3 rounded-xl border bg-card p-3" aria-label="Filters">
         <DateRangeFilter preset={preset} range={range} today={today} />
