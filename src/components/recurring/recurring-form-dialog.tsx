@@ -78,6 +78,7 @@ function RecurringForm({
   const active = accounts.filter((a) => a.is_active || a.id === schedule?.account_id || a.id === schedule?.to_account_id);
 
   const form = useForm<RecurringInput, unknown, Values>({
+    mode: "onTouched", reValidateMode: "onChange", 
     resolver: zodResolver(recurringSchema),
     defaultValues: {
       transactionType: schedule?.transaction_type ?? "expense",

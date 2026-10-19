@@ -21,6 +21,7 @@ export function LoginForm({ next }: { next?: string }) {
   const [formError, setFormError] = React.useState<string | null>(null);
   const retry = useRetryCountdown("login");
   const form = useForm<LoginInput>({
+    mode: "onTouched", reValidateMode: "onChange", 
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });

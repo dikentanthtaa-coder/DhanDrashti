@@ -30,7 +30,7 @@ export function ProfileForm({
   timezones: string[];
 }) {
   const [pending, startTransition] = React.useTransition();
-  const form = useForm<Values>({ resolver: zodResolver(profileSchema), defaultValues: { displayName, timezone, emailAlertsEnabled } });
+  const form = useForm<Values>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(profileSchema), defaultValues: { displayName, timezone, emailAlertsEnabled } });
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
       const r = await updateProfileAction(values);

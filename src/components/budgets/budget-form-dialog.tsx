@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { AmountInput } from "@/components/common/amount-input";
+import { AmountInput, numericKeyGuard } from "@/components/common/amount-input";
 import { CategorySelector } from "@/components/common/category-selector";
 import { FormSelect } from "@/components/common/form-select";
 import { FormErrorBanner, PillToggle } from "@/components/settings/form-helpers";
@@ -72,6 +72,7 @@ function BudgetForm({ categories, budget, defaultMonth, close }: { categories: C
   const [customThreshold, setCustomThreshold] = React.useState("");
 
   const form = useForm<BudgetInput, unknown, BudgetValues>({
+    mode: "onTouched", reValidateMode: "onChange", 
     resolver: zodResolver(budgetSchema),
     defaultValues: {
       categoryId: budget?.category_id ?? "",
@@ -196,7 +197,9 @@ function BudgetForm({ categories, budget, defaultMonth, close }: { categories: C
                   min={1}
                   max={200}
                   value={customThreshold}
-                  onChange={(e) => setCustomThreshold(e.target.value)}
+                  inputMode="numeric"
+                  onKeyDown={(e) => numericKeyGuard(e)}
+                  onChange={(e) => setCustomThreshold(e.target.value.replace(/\D/g, ""))}
                   placeholder="Custom %"
                   className="w-28"
                   aria-label="Custom threshold percent"

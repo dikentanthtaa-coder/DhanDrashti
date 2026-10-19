@@ -20,7 +20,7 @@ export function ForgotPasswordForm() {
   const [pending, startTransition] = React.useTransition();
   const [message, setMessage] = React.useState<{ kind: "ok" | "error"; text: string } | null>(null);
   const retry = useRetryCountdown("forgot-password");
-  const form = useForm<Values>({ resolver: zodResolver(forgotPasswordSchema), defaultValues: { email: "" } });
+  const form = useForm<Values>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(forgotPasswordSchema), defaultValues: { email: "" } });
 
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {

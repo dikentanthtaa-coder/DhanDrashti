@@ -56,6 +56,7 @@ function GoalForm({ accounts, goal, close }: { accounts: AccountRow[]; goal: Sav
   const [pending, startTransition] = React.useTransition();
   const [formError, setFormError] = React.useState<string | null>(null);
   const form = useForm<SavingsGoalInput, unknown, Values>({
+    mode: "onTouched", reValidateMode: "onChange", 
     resolver: zodResolver(savingsGoalSchema),
     defaultValues: {
       name: goal?.name ?? "",

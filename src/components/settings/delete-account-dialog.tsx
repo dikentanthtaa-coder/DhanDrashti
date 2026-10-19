@@ -20,7 +20,7 @@ type Values = z.infer<typeof deleteAccountSchema>;
 export function DeleteAccountDialog({ enabled }: { enabled: boolean }) {
   const [open, setOpen] = React.useState(false);
   const [pending, startTransition] = React.useTransition();
-  const form = useForm<Values>({ resolver: zodResolver(deleteAccountSchema), defaultValues: { confirmation: "" as "DELETE", password: "" } });
+  const form = useForm<Values>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(deleteAccountSchema), defaultValues: { confirmation: "" as "DELETE", password: "" } });
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
       const r = await deleteAccountAction(values);

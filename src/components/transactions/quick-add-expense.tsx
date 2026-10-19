@@ -41,7 +41,7 @@ export function QuickAddExpense({ accounts, categories, today }: { accounts: Acc
     isRefund: false,
     savingsGoalId: "",
   };
-  const form = useForm<TransactionInput, unknown, TransactionValues>({ resolver: zodResolver(transactionSchema), defaultValues: defaults });
+  const form = useForm<TransactionInput, unknown, TransactionValues>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(transactionSchema), defaultValues: defaults });
   const { errors } = form.formState;
   const accountOpts = accountOptions(activeAccounts);
   const methodOpts = paymentMethodOptions();

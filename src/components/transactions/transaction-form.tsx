@@ -100,6 +100,7 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
   const activeAccounts = accounts.filter((a) => a.is_active || a.id === transaction?.account_id || a.id === transaction?.to_account_id);
 
   const form = useForm<TransactionInput, unknown, TransactionValues>({
+    mode: "onTouched", reValidateMode: "onChange", 
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       ...defaultsFrom(transaction, today, defaultType),

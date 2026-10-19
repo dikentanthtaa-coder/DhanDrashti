@@ -17,7 +17,7 @@ type Values = z.infer<typeof resetPasswordSchema>;
 export function ResetPasswordForm() {
   const [pending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string | null>(null);
-  const form = useForm<Values>({ resolver: zodResolver(resetPasswordSchema), defaultValues: { password: "", confirmPassword: "" } });
+  const form = useForm<Values>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(resetPasswordSchema), defaultValues: { password: "", confirmPassword: "" } });
 
   const onSubmit = form.handleSubmit((values) => {
     setError(null);

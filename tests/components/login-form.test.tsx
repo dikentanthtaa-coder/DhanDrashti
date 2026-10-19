@@ -43,3 +43,16 @@ describe("LoginForm", () => {
     expect(input).toHaveAttribute("type", "text");
   });
 });
+
+describe("LoginForm live validation", () => {
+  it("validates as the user types after the first blur", async () => {
+    const user = userEvent.setup();
+    render(<LoginForm />);
+    const email = screen.getByLabelText(/email/i);
+    await user.type(email, "bad");
+    await user.tab();
+    expect(await screen.findByText(/valid email/i)).toBeInTheDocument();
+    await user.type(email, "@example.com");
+    await waitFor(() => expect(screen.queryByText(/valid email/i)).not.toBeInTheDocument());
+  });
+});

@@ -54,6 +54,7 @@ function ContributionForm({ goal, accounts, today, close }: { goal: SavingsGoalR
   const defaultTo = goal.account_id ?? active.find((a) => a.account_type === "savings" && a.id !== defaultFrom)?.id ?? active.find((a) => a.id !== defaultFrom)?.id ?? "";
 
   const form = useForm<Input, unknown, Values>({
+    mode: "onTouched", reValidateMode: "onChange", 
     resolver: zodResolver(contributionSchema),
     defaultValues: { goalId: goal.id, amount: "", transactionDate: today, fromAccountId: defaultFrom, toAccountId: defaultTo, note: "" },
   });

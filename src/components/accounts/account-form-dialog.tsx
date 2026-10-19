@@ -33,7 +33,7 @@ export function AccountFormDialog({ account, trigger }: { account?: AccountRow |
     openingBalance: account ? Number(account.opening_balance).toFixed(2) : "0",
     isActive: account?.is_active ?? true,
   };
-  const form = useForm<AccountInput, unknown, AccountValues>({ resolver: zodResolver(accountSchema), defaultValues: defaults });
+  const form = useForm<AccountInput, unknown, AccountValues>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(accountSchema), defaultValues: defaults });
   const { errors } = form.formState;
   const accountType = form.watch("accountType");
   const typeInfo = ACCOUNT_TYPES.find((t) => t.value === accountType);

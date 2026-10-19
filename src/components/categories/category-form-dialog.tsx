@@ -48,7 +48,7 @@ export function CategoryFormDialog({
     icon: category?.icon ?? "tag",
     color: category?.color ?? CATEGORY_COLORS[0],
   };
-  const form = useForm<CategoryInput, unknown, CategoryValues>({ resolver: zodResolver(categorySchema), defaultValues: defaults });
+  const form = useForm<CategoryInput, unknown, CategoryValues>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(categorySchema), defaultValues: defaults });
   const { errors } = form.formState;
   const type = form.watch("type");
   const icon = form.watch("icon");

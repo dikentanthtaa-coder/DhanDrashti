@@ -1,5 +1,7 @@
 "use client";
 
+import { numericKeyGuard } from "@/components/common/amount-input";
+
 import * as React from "react";
 import { toast } from "sonner";
 import type { SavingsTargetType } from "@/lib/types/database";
@@ -54,6 +56,7 @@ export function SavingsTargetForm({ type, value }: { type: SavingsTargetType | n
               <Input
                 id="target-value"
                 inputMode="decimal"
+                onKeyDown={(e) => numericKeyGuard(e, { decimal: true })}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className={kind === "fixed" ? "h-12 pl-7 text-xl font-semibold tabular" : "h-12 pr-8 text-xl font-semibold tabular"}

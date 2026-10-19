@@ -23,6 +23,7 @@ export function SignupForm() {
   const [sentTo, setSentTo] = React.useState<string | null>(null);
   const retry = useRetryCountdown("signup");
   const form = useForm<SignupInput>({
+    mode: "onTouched", reValidateMode: "onChange", 
     resolver: zodResolver(signupSchema),
     defaultValues: { displayName: "", email: "", password: "", confirmPassword: "" },
   });

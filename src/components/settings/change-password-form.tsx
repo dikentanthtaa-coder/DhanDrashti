@@ -16,7 +16,7 @@ type Values = z.infer<typeof changePasswordSchema>;
 
 export function ChangePasswordForm() {
   const [pending, startTransition] = React.useTransition();
-  const form = useForm<Values>({ resolver: zodResolver(changePasswordSchema), defaultValues: { currentPassword: "", password: "", confirmPassword: "" } });
+  const form = useForm<Values>({ mode: "onTouched", reValidateMode: "onChange", resolver: zodResolver(changePasswordSchema), defaultValues: { currentPassword: "", password: "", confirmPassword: "" } });
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
       const r = await changePasswordAction(values);
