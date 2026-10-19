@@ -44,10 +44,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
+  themeColor: "#0f766e",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
