@@ -23,9 +23,8 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
         <BrandLogo size={36} />
         <span className="text-lg font-semibold tracking-tight">{APP_NAME}</span>
       </Link>
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">Menu</p>
-        <ul className="flex flex-col gap-1">
+      <nav className="flex-1 overflow-y-auto px-4 py-6">
+        <ul className="flex flex-col gap-2.5">
           {NAV_ITEMS.map((item) => {
             const active = isActivePath(pathname, item.href);
             return (
@@ -34,13 +33,13 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "group relative flex items-center gap-3 rounded-lg py-3 pr-3 pl-4 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                    "group relative flex items-center gap-5 overflow-hidden rounded-xl py-3.5 pr-4 pl-6 text-[15px] font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active
-                      ? "bg-primary/10 text-primary before:absolute before:top-2 before:bottom-2 before:left-0 before:w-1 before:rounded-full before:bg-primary"
+                      ? "bg-primary/10 text-primary before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-primary"
                       : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
-                  <item.icon className={cn("size-5", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} aria-hidden="true" />
+                  <item.icon className={cn("size-6", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} strokeWidth={active ? 2.25 : 1.75} aria-hidden="true" />
                   <span className="flex-1">{item.label}</span>
                   {item.href === "/notifications" && unreadCount > 0 ? (
                     <Badge variant="secondary" className="h-5 min-w-5 justify-center px-1.5 text-xs" aria-label={`${unreadCount} unread`}>
