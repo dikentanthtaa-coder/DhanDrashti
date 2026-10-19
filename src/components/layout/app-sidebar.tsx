@@ -15,10 +15,14 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
       className="no-print sticky top-0 hidden h-svh w-64 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex"
       aria-label="Primary"
     >
-      <div className="flex h-16 items-center gap-2.5 border-b px-5">
+      <Link
+        href="/dashboard"
+        className="flex h-16 items-center gap-2.5 border-b px-5 outline-none transition-colors hover:bg-sidebar-accent/60 focus-visible:ring-3 focus-visible:ring-ring/50"
+        aria-label={`${APP_NAME} home`}
+      >
         <BrandLogo size={36} />
         <span className="text-lg font-semibold tracking-tight">{APP_NAME}</span>
-      </div>
+      </Link>
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">Menu</p>
         <ul className="flex flex-col gap-1">
