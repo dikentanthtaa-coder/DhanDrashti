@@ -30,21 +30,13 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "group flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                    "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active
-                      ? "bg-primary/10 text-foreground ring-1 ring-primary/20"
+                      ? "bg-primary/10 text-primary before:absolute before:top-2 before:bottom-2 before:left-0 before:w-0.5 before:rounded-full before:bg-primary"
                       : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
-                  <span
-                    className={cn(
-                      "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors",
-                      active ? "bg-primary text-primary-foreground shadow-sm" : "bg-sidebar-accent/70 text-muted-foreground group-hover:bg-sidebar-accent group-hover:text-foreground"
-                    )}
-                    aria-hidden="true"
-                  >
-                    <item.icon className="size-4" />
-                  </span>
+                  <item.icon className={cn("size-[18px]", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} aria-hidden="true" />
                   <span className="flex-1">{item.label}</span>
                   {item.href === "/notifications" && unreadCount > 0 ? (
                     <Badge variant="secondary" className="h-5 min-w-5 justify-center px-1.5 text-xs" aria-label={`${unreadCount} unread`}>
