@@ -13,9 +13,13 @@ export function ServiceWorkerManager() {
     if (process.env.NODE_ENV !== "production") return;
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
 
+    // On the very first visit the worker claims the page (clientsClaim) — that is
+    // not an update, so never reload then; only reload when a previous controller
+    // is replaced after the user accepted an update.
+    const hadController = Boolean(navigator.serviceWorker.controller);
     let refreshing = false;
     const onControllerChange = () => {
-      if (refreshing) return;
+      if (!hadController || refreshing) return;
       refreshing = true;
       window.location.reload();
     };
