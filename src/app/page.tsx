@@ -31,7 +31,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex min-h-svh flex-col bg-background">
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 lg:px-8">
           <Link href="/" className="flex items-center gap-2.5 font-semibold" aria-label={`${APP_NAME} home`}>

@@ -178,6 +178,11 @@
        page grows/shrinks or a modal locks scrolling. */
     scrollbar-gutter: stable;
     overflow-y: scroll;
+    /* No elastic bounce in either direction (trackpad / touch) and never a
+       horizontal page scroll — content wider than the screen scrolls inside
+       its own container instead. */
+    overscroll-behavior: none;
+    overflow-x: hidden;
   }
   /* Radix/react-remove-scroll pads the body by the scrollbar width while a
      dialog/select is open; with the gutter already reserved that padding would
@@ -190,8 +195,9 @@
     color-scheme: dark;
   }
   body {
-    min-height: 100dvh;
-    overscroll-behavior-y: none;
+    min-height: 100svh;
+    overscroll-behavior: none;
+    overflow-x: clip;
   }
   /* Numeric columns align; hero figures stay proportional. */
   .tabular {

@@ -67,7 +67,7 @@ export function TimezonePicker({ id, value, onChange, timezones, invalid }: { id
         <ChevronsUpDown className="size-4 shrink-0 opacity-50" />
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg" showCloseButton={false}>
+        <DialogContent className="flex max-h-[85svh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg" showCloseButton={false}>
           <DialogHeader className="border-b px-4 pt-4 pb-3 text-left">
             <div className="flex items-center justify-between gap-2">
               <DialogTitle>Choose your timezone</DialogTitle>
@@ -81,7 +81,7 @@ export function TimezonePicker({ id, value, onChange, timezones, invalid }: { id
             <div className="px-2 pt-2 [&_[data-slot=input-group]]:h-11! [&_[data-slot=input-group]]:border-input [&_[data-slot=input-group]]:bg-background [&_[data-slot=input-group]]:text-base">
               <CommandInput placeholder="Search timezones…" autoFocus />
             </div>
-            <CommandList className="max-h-[60dvh] px-2 py-2">
+            <CommandList className="max-h-[60svh] px-2 py-2">
               <CommandEmpty>No timezone matches your search.</CommandEmpty>
               {popular.length ? (
                 <CommandGroup heading="Popular">

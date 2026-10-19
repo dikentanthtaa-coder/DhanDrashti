@@ -15,7 +15,7 @@ export function AuthShell({
   footer?: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-muted/40 px-4 py-10">
+    <main className="flex min-h-svh flex-col items-center justify-center bg-muted/40 px-4 py-10">
       <Link href="/" className="mb-6 flex items-center gap-2 text-lg font-semibold" aria-label={`${APP_NAME} home`}>
         <BrandLogo size={40} />
         {APP_NAME}

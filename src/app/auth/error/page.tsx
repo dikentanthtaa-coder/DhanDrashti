@@ -6,7 +6,7 @@ export const metadata = { title: "Link expired" };
 
 export default function AuthErrorPage() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
+    <main className="flex min-h-svh flex-col items-center justify-center gap-4 px-6 text-center">
       <div className="flex size-14 items-center justify-center rounded-2xl bg-destructive/10">
         <AlertTriangle className="size-7 text-destructive" aria-hidden="true" />
       </div>

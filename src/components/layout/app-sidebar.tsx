@@ -12,7 +12,7 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
   return (
     <aside
-      className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex"
+      className="no-print sticky top-0 hidden h-svh w-64 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex"
       aria-label="Primary"
     >
       <div className="flex h-16 items-center gap-2.5 border-b px-5">

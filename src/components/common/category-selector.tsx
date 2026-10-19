@@ -79,7 +79,7 @@ export function CategorySelector({
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg" showCloseButton={false}>
+        <DialogContent className="flex max-h-[85svh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg" showCloseButton={false}>
           <DialogHeader className="border-b px-4 pt-4 pb-3 text-left">
             <div className="flex items-center justify-between gap-2">
               <DialogTitle>{type === "income" ? "Choose an income category" : "Choose an expense category"}</DialogTitle>
@@ -93,7 +93,7 @@ export function CategorySelector({
             <div className="px-2 pt-2 [&_[data-slot=input-group]]:h-11! [&_[data-slot=input-group]]:bg-background [&_[data-slot=input-group]]:border-input [&_[data-slot=input-group]]:text-base">
               <CommandInput placeholder="Search categories…" autoFocus />
             </div>
-            <CommandList className="max-h-[60dvh] px-2 py-2">
+            <CommandList className="max-h-[60svh] px-2 py-2">
               <CommandEmpty>No category matches your search.</CommandEmpty>
               {allowClear && value ? (
                 <CommandGroup>

@@ -52,7 +52,7 @@ export function MobileNavigation({ unreadCount = 0 }: { unreadCount?: number }) 
                 More
               </button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="max-h-[80dvh] overflow-y-auto rounded-t-2xl">
+            <SheetContent side="bottom" className="max-h-[80svh] overflow-y-auto rounded-t-2xl">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
                   <BrandLogo size={28} /> {APP_NAME}
