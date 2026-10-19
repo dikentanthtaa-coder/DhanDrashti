@@ -32,6 +32,7 @@ A production-quality personal finance manager for India: track daily expenses an
 
 ## Features
 
+- **Profile photo (optional)** — upload a JPEG/PNG/WebP (≤ 2 MB) under Settings → Profile; stored in a private `avatars` bucket and shown via short-lived signed URLs; initials are shown when no photo is set.
 - **Authentication** — email + password sign-up with email verification, sign-in, sign-out (all devices), forgot/reset password, change password (re-authenticates first), profile settings, account deletion (receipts + all data), server-verified sessions via `@supabase/ssr`.
 - **Accounts** — cash, bank, savings, credit card, other; computed balances; activate/deactivate.
 - **Categories** — 18 default expense groups with 91 subcategories and 9 income categories (seeded idempotently as global, read-only rows), plus user categories with icon/colour, nesting under global or own parents, reorder, archive, delete.
@@ -149,6 +150,7 @@ Migrations live in `supabase/migrations/` and are safe to re-run (idempotent `cr
 | `20261019000003_functions.sql` | aggregation RPCs, budget alerts, recurring processor, rate limiter |
 | `20261019000004_storage.sql` | `receipts` bucket and storage policies |
 | `20261019000005_seed_categories.sql` | default categories (generated from `scripts/taxonomy.mjs`) |
+| `20261019000006_avatars.sql` | `profiles.avatar_path` and the private `avatars` bucket (2 MB, JPEG/PNG/WebP) with owner-scoped policies |
 
 Apply them with any **one** of:
 
