@@ -60,7 +60,19 @@ export async function confirmUserByEmail(email: string): Promise<string> {
   }
 }
 
+/** Removes the user's receipt files (storage does not cascade) and then the auth user. */
 export async function deleteUser(id: string) {
   const admin = adminClient();
+  try {
+    const { data: folders } = await admin.storage.from("receipts").list(id, { limit: 1000 });
+    const paths: string[] = [];
+    for (const folder of folders ?? []) {
+      const { data: files } = await admin.storage.from("receipts").list(`${id}/${folder.name}`, { limit: 1000 });
+      for (const f of files ?? []) paths.push(`${id}/${folder.name}/${f.name}`);
+    }
+    if (paths.length) await admin.storage.from("receipts").remove(paths);
+  } catch {
+    /* best effort */
+  }
   await admin.auth.admin.deleteUser(id).catch(() => {});
 }

@@ -242,7 +242,7 @@ Email delivery is optional: set `RESEND_API_KEY` and `EMAIL_FROM`, and the user 
 - Storage RLS allows a user to read/write/delete only inside their own top-level folder; the `transactions.receipt_path` column has a CHECK that the path starts with the owner's id.
 - Uploads go through a Server Action that verifies the transaction belongs to the caller, enforces the 5 MB limit and allowed MIME types (JPEG, PNG, WebP, PDF), checks the file's magic bytes, and rate-limits uploads. Bucket-level limits are enforced by Supabase too.
 - Viewing uses short-lived signed URLs (2 minutes) created server-side after an ownership check; there are no public URLs.
-- Replacing a receipt deletes the previous object; deleting a transaction or the account removes its files. Receipt contents are never logged.
+- Replacing a receipt deletes the previous object; deleting a transaction or the account (via Settings → Security) removes its files. Note that deleting a user from the Supabase dashboard or admin API does **not** cascade to Storage — remove the user's `receipts/<user_id>/` folder as well. Receipt contents are never logged.
 
 ## Progressive Web App
 
