@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
 import { NAV_ITEMS, isActivePath } from "@/components/layout/nav-config";
 import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/common/brand-logo";
 
 export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
@@ -15,9 +16,7 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
       aria-label="Primary"
     >
       <div className="flex h-16 items-center gap-2.5 border-b px-5">
-        <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-lg font-semibold text-primary-foreground shadow-sm" aria-hidden="true">
-          ₹
-        </span>
+        <BrandLogo size={36} />
         <span className="text-lg font-semibold tracking-tight">{APP_NAME}</span>
       </div>
       <nav className="flex-1 overflow-y-auto px-3 py-4">

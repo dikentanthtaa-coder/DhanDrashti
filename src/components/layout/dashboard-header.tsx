@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
 import { APP_NAME } from "@/lib/constants";
+import { BrandLogo } from "@/components/common/brand-logo";
 
 export function DashboardHeader({ name, email, unreadCount }: { name: string; email: string; unreadCount: number }) {
   return (
     <header className="no-print sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-background/90 px-4 backdrop-blur lg:px-8">
       <Link href="/dashboard" className="flex items-center gap-2 font-semibold lg:hidden" aria-label={`${APP_NAME} dashboard`}>
-        <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground" aria-hidden="true">
-          ₹
-        </span>
+        <BrandLogo size={30} />
         {APP_NAME}
       </Link>
       <div className="ml-auto flex items-center gap-1">

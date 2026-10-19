@@ -9,6 +9,7 @@ import { NAV_ITEMS, isActivePath } from "@/components/layout/nav-config";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { APP_NAME } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/common/brand-logo";
 
 export function MobileNavigation({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
@@ -53,7 +54,9 @@ export function MobileNavigation({ unreadCount = 0 }: { unreadCount?: number }) 
             </SheetTrigger>
             <SheetContent side="bottom" className="max-h-[80dvh] overflow-y-auto rounded-t-2xl">
               <SheetHeader>
-                <SheetTitle>{APP_NAME}</SheetTitle>
+                <SheetTitle className="flex items-center gap-2">
+                  <BrandLogo size={28} /> {APP_NAME}
+                </SheetTitle>
               </SheetHeader>
               <ul className="grid grid-cols-2 gap-2 px-4 pb-6">
                 {NAV_ITEMS.map((item) => {

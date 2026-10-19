@@ -7,6 +7,7 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { APP_DESCRIPTION, APP_NAME } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { BrandLogo } from "@/components/common/brand-logo";
 
 export const metadata: Metadata = {
   title: `${APP_NAME} · Track expenses, budgets and savings in ₹`,
@@ -34,9 +35,7 @@ export default async function HomePage() {
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 lg:px-8">
           <Link href="/" className="flex items-center gap-2.5 font-semibold" aria-label={`${APP_NAME} home`}>
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-lg text-primary-foreground" aria-hidden="true">
-              ₹
-            </span>
+            <BrandLogo size={36} />
             <span className="text-lg tracking-tight">{APP_NAME}</span>
           </Link>
           <nav className="flex items-center gap-2" aria-label="Account">
