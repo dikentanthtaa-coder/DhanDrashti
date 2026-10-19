@@ -4,9 +4,9 @@ import { categoryTypeSchema, hexColorSchema, uuidSchema } from "@/lib/validation
 export const categorySchema = z.object({
   name: z.string().trim().min(1, "Enter a category name").max(60),
   type: categoryTypeSchema,
-  parentId: uuidSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
-  icon: z.string().trim().max(40).optional().transform((v) => (v ? v : null)),
-  color: hexColorSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
+  parentId: uuidSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
+  icon: z.string().trim().max(40).nullable().optional().transform((v) => (v ? v : null)),
+  color: hexColorSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
 });
 
 export const reorderCategoriesSchema = z.object({

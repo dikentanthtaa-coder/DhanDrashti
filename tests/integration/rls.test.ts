@@ -259,9 +259,19 @@ describe("receipt storage isolation", () => {
     expect(msg).toMatch(/row-level security/i);
     const seen = await asUser(pool, bob, (c) => c.query(`select name from storage.objects where bucket_id = 'receipts' and name like $1`, [`${alice.id}/%`]));
     expect(seen.rowCount).toBe(0);
-    const del = await asUser(pool, bob, (c) => c.query(`delete from storage.objects where bucket_id = 'receipts' and name like $1`, [`${alice.id}/%`]));
-    expect(del.rowCount).toBe(0);
-    await pool.query(`delete from storage.objects where bucket_id = 'receipts' and name like $1`, [`${alice.id}/%`]);
+    // Newer storage schemas forbid direct SQL deletes entirely (API only); older ones
+    // let RLS filter the rows. Either way Bob must not remove Alice's object.
+    let deletedRows = 0;
+    try {
+      const del = await asUser(pool, bob, (c) => c.query(`delete from storage.objects where bucket_id = 'receipts' and name like $1`, [`${alice.id}/%`]));
+      deletedRows = del.rowCount ?? 0;
+    } catch (err) {
+      expect((err as Error).message).toMatch(/not allowed|row-level security/i);
+    }
+    expect(deletedRows).toBe(0);
+    const still = await pool.query(`select count(*)::int as n from storage.objects where bucket_id = 'receipts' and name like $1`, [`${alice.id}/%`]);
+    expect(still.rows[0].n).toBe(1);
+    await pool.query(`delete from storage.objects where bucket_id = 'receipts' and name like $1`, [`${alice.id}/%`]).catch(() => {});
   });
 
   it("receipt_path on a transaction must live under the owner's folder", async () => {

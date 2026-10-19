@@ -4,9 +4,9 @@ import { amountSchema, dateStringSchema, optionalText, uuidSchema } from "@/lib/
 export const savingsGoalSchema = z.object({
   name: z.string().trim().min(1, "Enter a goal name").max(80),
   targetAmount: amountSchema,
-  targetDate: dateStringSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
+  targetDate: dateStringSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
   description: optionalText(500),
-  accountId: uuidSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
+  accountId: uuidSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
   status: z.enum(["active", "completed", "archived"]).default("active"),
 });
 

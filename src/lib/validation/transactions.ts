@@ -14,13 +14,13 @@ export const transactionSchema = z
     amount: amountSchema,
     transactionDate: dateStringSchema,
     accountId: uuidSchema,
-    toAccountId: uuidSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
-    categoryId: uuidSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
-    paymentMethod: paymentMethodSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
+    toAccountId: uuidSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
+    categoryId: uuidSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
+    paymentMethod: paymentMethodSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
     merchant: optionalText(120),
     note: optionalText(1000),
     isRefund: z.boolean().default(false),
-    savingsGoalId: uuidSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
+    savingsGoalId: uuidSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
   })
   .superRefine((d, ctx) => {
     if (d.transactionType === "transfer") {

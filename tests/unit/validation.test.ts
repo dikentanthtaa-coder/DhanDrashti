@@ -79,3 +79,18 @@ describe("auth schemas", () => {
     if (!mismatch.success) expect(mismatch.error.issues[0].path).toEqual(["confirmPassword"]);
   });
 });
+
+describe("schema idempotency (server re-validates client-transformed output)", () => {
+  it("transaction output is valid input again", () => {
+    const first = transactionSchema.parse({ transactionType: "expense", amount: "10", transactionDate: "2026-10-19", accountId: A, categoryId: C, note: "", merchant: "" });
+    expect(first.note).toBeNull();
+    const second = transactionSchema.safeParse(first);
+    expect(second.success).toBe(true);
+  });
+  it("recurring and budget outputs are valid inputs again", () => {
+    const r = recurringSchema.parse({ transactionType: "expense", amount: "100", accountId: A, categoryId: C, frequency: "monthly", startDate: "2026-01-31" });
+    expect(recurringSchema.safeParse(r).error?.issues ?? []).toEqual([]);
+    const b = budgetSchema.parse({ amountLimit: "8000", periodStart: "2026-10-01" });
+    expect(budgetSchema.safeParse(b).error?.issues ?? []).toEqual([]);
+  });
+});

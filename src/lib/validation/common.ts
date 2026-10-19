@@ -33,6 +33,7 @@ export const optionalText = (max: number) =>
     .string()
     .trim()
     .max(max, `Must be ${max} characters or fewer`)
+    .nullable()
     .optional()
     .transform((v) => (v && v.length > 0 ? v : null));
 

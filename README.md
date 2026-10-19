@@ -2,7 +2,7 @@
 
 A production-quality personal finance manager for India: track daily expenses and income, manage monthly budgets with alerts, plan savings, run recurring bills, attach private receipts, and export reports — all in ₹ with Indian digit grouping, installable as a PWA, and secured by Supabase Row Level Security.
 
-> Status: the application code, database migrations, RLS policies, PWA and tests are complete and verified locally (lint, type-check, unit, component and database integration tests, production build). **Deployment to Vercel and the hosted Supabase project are manual steps** documented below — nothing has been deployed by the build process.
+> Status: the application code, database migrations, RLS policies, PWA and tests are complete and verified locally — lint, type-check, unit/component tests, database integration tests (against both a plain `supabase/postgres` image and a full `supabase start` stack), the Playwright end-to-end journey against the local Supabase stack, and the production build. **Deployment to Vercel and the hosted Supabase project are manual steps** documented below — nothing has been deployed by the build process.
 
 ---
 
@@ -167,6 +167,8 @@ pnpm test:e2e          # Playwright — needs a Supabase project + SUPABASE_SECR
 pnpm build             # next build + serwist build (service worker)
 pnpm check             # lint + typecheck + unit tests
 ```
+
+**Local Supabase (optional, recommended)** — the repo includes `supabase/config.toml` for the Supabase CLI (installed as a dev dependency). `pnpm exec supabase start` launches Postgres, Auth, PostgREST, Storage and Mailpit in Docker, applies the migrations automatically and prints local keys; `pnpm exec supabase status -o env` shows them. Put `API_URL`/`PUBLISHABLE_KEY`/`SECRET_KEY`/`DB_URL` into `.env.local` as `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` and `DATABASE_URL`. Verification emails land in Mailpit (http://127.0.0.1:54324). `pnpm exec supabase stop` shuts it down.
 
 **Database integration tests** run real SQL against a Postgres that has the migrations applied and impersonate users exactly like PostgREST (`SET ROLE authenticated` + JWT claims). They verify SELECT/INSERT/UPDATE/DELETE isolation, related account/category/goal ownership, storage folder isolation, recurring idempotency and alert de-duplication. Locally:
 

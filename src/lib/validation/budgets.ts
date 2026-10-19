@@ -3,12 +3,13 @@ import { amountSchema, dateStringSchema, uuidSchema } from "@/lib/validation/com
 
 export const budgetSchema = z
   .object({
-    categoryId: uuidSchema.optional().or(z.literal("")).transform((v) => (v ? v : null)),
+    categoryId: uuidSchema.optional().or(z.literal("")).nullable().transform((v) => (v ? v : null)),
     amountLimit: amountSchema,
     periodStart: dateStringSchema.refine((d) => d.endsWith("-01"), "Budgets start on the 1st of a month"),
     periodEnd: dateStringSchema
       .optional()
       .or(z.literal(""))
+      .nullable()
       .transform((v) => (v ? v : null))
       .refine((d) => !d || d.endsWith("-01"), "End must be the 1st of a month"),
     alertThresholds: z
