@@ -59,11 +59,20 @@ export async function signUpAction(input: unknown): Promise<ActionResult<{ needs
   });
 
   if (error) {
-    // Weak password / rate limits are safe to surface; everything else stays generic
-    // so that account existence is not revealed.
+    // Errors that do not reveal whether an account exists are shown to the user;
+    // anything else stays generic so that account existence is not revealed.
     if (error.code === "weak_password") return fail(error.message, { password: [error.message] });
-    if (error.status === 429) return fail("Too many attempts. Please wait a minute and try again.");
+    if (error.code === "email_address_invalid" || error.code === "validation_failed") {
+      return fail("Enter a valid, deliverable email address.", { email: ["Enter a valid, deliverable email address."] });
+    }
+    if (error.status === 429 || error.code === "over_email_send_rate_limit") {
+      return fail("Too many attempts. Please wait a minute and try again.");
+    }
     if (error.code === "signup_disabled") return fail("Sign-ups are currently disabled.");
+    if (error.message?.toLowerCase().includes("error sending") || error.code === "unexpected_failure") {
+      console.error("signUp: email delivery failed", error.code ?? error.status);
+      return fail("We couldn't send the verification email right now. Please try again in a few minutes.");
+    }
     return ok({ needsVerification: true });
   }
 

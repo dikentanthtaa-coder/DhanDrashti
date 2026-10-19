@@ -56,10 +56,20 @@ test("register → verify → sign in → transact → budget → report → exp
   await page.getByLabel("Password", { exact: true }).fill(creds.password);
   await page.getByLabel("Confirm password").fill(creds.password);
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByText(/check your inbox/i)).toBeVisible();
+  const inbox = page.getByText(/check your inbox/i);
+  const rateLimited = page.getByText(/too many attempts/i);
+  await expect(inbox.or(rateLimited)).toBeVisible();
 
-  // 2. Simulate clicking the verification email (admin API marks the email confirmed)
-  const userId = await confirmUserByEmail(creds.email);
+  // 2. Simulate clicking the verification email (admin API marks the email confirmed).
+  //    Hosted projects on the default email provider allow only a few emails per hour;
+  //    when that limit is hit the UI reports it and we create the verified user directly.
+  let userId: string;
+  if (await rateLimited.isVisible()) {
+    console.warn("Sign-up email rate limit reached on this Supabase project; creating the user via the admin API instead.");
+    userId = (await createVerifiedUser("journey", creds)).id;
+  } else {
+    userId = await confirmUserByEmail(creds.email);
+  }
   createdUserIds.push(userId);
 
   // 3. Sign in

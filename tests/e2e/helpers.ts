@@ -23,14 +23,16 @@ export interface E2EUser {
   password: string;
 }
 
+// Hosted Supabase rejects reserved domains such as example.com; use a real-looking
+// domain with no mailbox so verification emails simply bounce.
 export function testCredentials(label: string): { email: string; password: string } {
-  return { email: `e2e-${label}-${randomUUID().slice(0, 8)}@example.com`, password: `E2e-pass-${randomUUID().slice(0, 10)}1` };
+  return { email: `e2e-${label}-${randomUUID().slice(0, 8)}@dhandrashti.vercel.app`, password: `E2e-pass-${randomUUID().slice(0, 10)}1` };
 }
 
 /** Creates an already-verified user (simulates completed email verification). */
-export async function createVerifiedUser(label: string): Promise<E2EUser> {
+export async function createVerifiedUser(label: string, credentials?: { email: string; password: string }): Promise<E2EUser> {
   const admin = adminClient();
-  const creds = testCredentials(label);
+  const creds = credentials ?? testCredentials(label);
   const { data, error } = await admin.auth.admin.createUser({
     email: creds.email,
     password: creds.password,

@@ -2,6 +2,8 @@
 
 A production-quality personal finance manager for India: track daily expenses and income, manage monthly budgets with alerts, plan savings, run recurring bills, attach private receipts, and export reports — all in ₹ with Indian digit grouping, installable as a PWA, and secured by Supabase Row Level Security.
 
+> Live deployment: **https://dhandrashti.vercel.app** (Vercel project `dhandrashti`, Supabase project `dtvfzkaquhjkipibacju`, region ap-south-1). Migrations are applied, the private receipts bucket exists, the Vercel Cron job is registered, and the end-to-end journey was run against the live site.
+>
 > Status: the application code, database migrations, RLS policies, PWA and tests are complete and verified locally — lint, type-check, unit/component tests, database integration tests (against both a plain `supabase/postgres` image and a full `supabase start` stack), the Playwright end-to-end journey against the local Supabase stack, and the production build. **Deployment to Vercel and the hosted Supabase project are manual steps** documented below — nothing has been deployed by the build process.
 
 ---
@@ -131,7 +133,7 @@ Copy `.env.example` to `.env.local`. Real `.env*` files are git-ignored.
    - Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next=/dashboard`
    - Reset password: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
    - Change email: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/settings/profile`
-   Supabase's built-in SMTP is rate-limited (a few emails per hour); configure a custom SMTP provider (Authentication → SMTP Settings) for production.
+   **Free-tier note:** email templates can only be edited after a custom SMTP provider is configured (Authentication → SMTP Settings; Resend, Brevo, Postmark, etc. with a domain you own). Until then Supabase's built-in sender is used, which allows only ~2 emails per hour (sign-ups beyond that show "Too many attempts") and sends its default templates. The default templates still work with this app: the confirmation link goes through Supabase and lands on `/auth/confirm?code=…` (PKCE), which the app exchanges for a session — but that link must be opened in the same browser that started the sign-up. Custom SMTP + the token-hash templates above remove both limitations.
 6. **Authentication → Rate limits**: defaults are fine; Supabase Auth already rate-limits sign-in, sign-up and password reset.
 7. **Storage**: the migration creates the private `receipts` bucket (5 MB, JPEG/PNG/WebP/PDF) with owner-scoped policies. Verify under Storage → Policies that the four `receipts: … own` policies exist and that the bucket is **not** public.
 8. **Verify RLS**: Database → Tables — every table listed in `supabase/migrations/20261019000002_rls.sql` must show "RLS enabled". The integration tests (below) prove the policies behave correctly.
