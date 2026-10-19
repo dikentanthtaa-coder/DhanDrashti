@@ -36,7 +36,7 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                   className={cn(
                     "group relative flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active
-                      ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)]"
+                      ? "border-primary/40 border-l-2 border-l-primary bg-primary/10 text-primary"
                       : "border-transparent text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
