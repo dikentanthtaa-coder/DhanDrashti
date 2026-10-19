@@ -47,16 +47,16 @@ export function SummaryCard({
 }) {
   const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
-    <Card className={cn("py-5", className)}>
-      <CardContent className="flex items-start gap-4 px-5">
+    <Card className={cn("py-4", className)}>
+      <CardContent className="flex items-start gap-3.5 px-4">
         {Icon ? (
-          <span className={cn("flex size-12 shrink-0 items-center justify-center rounded-2xl", TILE[tone])} aria-hidden="true">
-            <Icon className="size-6" />
+          <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", TILE[tone])} aria-hidden="true">
+            <Icon className="size-[18px]" />
           </span>
         ) : null}
         <div className="min-w-0 flex-1">
-          <div className="line-clamp-2 text-sm leading-snug text-muted-foreground">{title}</div>
-          <div className="tabular mt-1 text-[1.6rem] leading-tight font-semibold tracking-tight break-words">{value}</div>
+          <div className="line-clamp-2 text-[13px] leading-snug text-muted-foreground">{title}</div>
+          <div className="tabular mt-0.5 text-xl leading-tight font-semibold tracking-tight break-words">{value}</div>
           <div className="mt-2 flex items-end justify-between gap-3">
             <div className="min-w-0">
               {delta ? <DeltaLine delta={delta} /> : null}
@@ -64,7 +64,7 @@ export function SummaryCard({
             </div>
             {sparkline && sparkline.length > 1 ? (
               <div className="shrink-0 text-muted-foreground">
-                <Sparkline id={id} data={sparkline} stroke={LINE[tone]} width={84} height={34} />
+                <Sparkline id={id} data={sparkline} stroke={LINE[tone]} width={72} height={28} />
               </div>
             ) : null}
           </div>
