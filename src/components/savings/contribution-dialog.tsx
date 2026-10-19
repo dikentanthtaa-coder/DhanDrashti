@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { FormSelect } from "@/components/common/form-select";
+import { accountOptions, FormErrorBanner } from "@/components/settings/form-helpers";
 import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/common/amount-input";
-import { ACCOUNT_TYPE_LABELS } from "@/lib/constants";
 
 type Input = z.input<typeof contributionSchema>;
 type Values = z.output<typeof contributionSchema>;
@@ -35,7 +35,7 @@ export function ContributionDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add contribution to “{goal.name}”</DialogTitle>
           <DialogDescription>Recorded as a transfer between your own accounts. It is never counted as an expense.</DialogDescription>
@@ -73,18 +73,17 @@ function ContributionForm({ goal, accounts, today, close }: { goal: SavingsGoalR
   });
 
   const errors = form.formState.errors;
+  const accountOpts = accountOptions(active);
+  const fromId = form.watch("fromAccountId");
+  const toId = form.watch("toAccountId");
   return (
         <form onSubmit={onSubmit} noValidate aria-busy={pending}>
-          <FieldGroup>
-            {formError ? (
-              <p role="alert" className="text-sm text-destructive">
-                {formError}
-              </p>
-            ) : null}
-            <div className="grid grid-cols-2 gap-3">
+          <FieldGroup className="gap-5">
+            <FormErrorBanner message={formError} />
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field data-invalid={!!errors.amount}>
                 <FieldLabel htmlFor="contrib-amount">Amount</FieldLabel>
-                <AmountInput id="contrib-amount" autoFocus aria-invalid={!!errors.amount} {...form.register("amount")} />
+                <AmountInput id="contrib-amount" autoFocus className="h-12 text-xl font-semibold" aria-invalid={!!errors.amount} {...form.register("amount")} />
                 <FieldError errors={[errors.amount]} />
               </Field>
               <Field data-invalid={!!errors.transactionDate}>
@@ -95,24 +94,20 @@ function ContributionForm({ goal, accounts, today, close }: { goal: SavingsGoalR
             </div>
             <Field data-invalid={!!errors.fromAccountId}>
               <FieldLabel htmlFor="contrib-from">From account</FieldLabel>
-              <NativeSelect id="contrib-from" aria-invalid={!!errors.fromAccountId} {...form.register("fromAccountId")}>
-                {active.map((a) => (
-                  <NativeSelectOption key={a.id} value={a.id}>
-                    {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+              <Controller
+                control={form.control}
+                name="fromAccountId"
+                render={({ field }) => <FormSelect id="contrib-from" value={field.value} onValueChange={field.onChange} invalid={!!errors.fromAccountId} options={accountOpts.filter((o) => o.value !== toId)} placeholder="Choose the source account" />}
+              />
               <FieldError errors={[errors.fromAccountId]} />
             </Field>
             <Field data-invalid={!!errors.toAccountId}>
               <FieldLabel htmlFor="contrib-to">To account</FieldLabel>
-              <NativeSelect id="contrib-to" aria-invalid={!!errors.toAccountId} {...form.register("toAccountId")}>
-                {active.map((a) => (
-                  <NativeSelectOption key={a.id} value={a.id}>
-                    {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+              <Controller
+                control={form.control}
+                name="toAccountId"
+                render={({ field }) => <FormSelect id="contrib-to" value={field.value} onValueChange={field.onChange} invalid={!!errors.toAccountId} options={accountOpts.filter((o) => o.value !== fromId)} placeholder="Choose the savings account" />}
+              />
               <FieldDescription>{goal.account_id ? "Defaults to the goal's linked account." : "Usually a savings account."}</FieldDescription>
               <FieldError errors={[errors.toAccountId]} />
             </Field>
@@ -122,7 +117,7 @@ function ContributionForm({ goal, accounts, today, close }: { goal: SavingsGoalR
               <FieldError errors={[errors.note]} />
             </Field>
           </FieldGroup>
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-6 gap-2">
             <Button type="button" variant="outline" onClick={close} disabled={pending}>
               Cancel
             </Button>

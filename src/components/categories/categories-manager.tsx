@@ -15,14 +15,14 @@ export function CategoriesManager({ categories }: { categories: CategoryRow[] })
   const [showArchived, setShowArchived] = React.useState(false);
   const [tab, setTab] = React.useState<"expense" | "income">("expense");
   return (
-    <Tabs value={tab} onValueChange={(v) => setTab(v as "expense" | "income")} className="gap-4">
+    <Tabs value={tab} onValueChange={(v) => setTab(v as "expense" | "income")} className="gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabsList>
           <TabsTrigger value="expense">Expense</TabsTrigger>
           <TabsTrigger value="income">Income</TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-lg border px-3 py-2">
             <Switch id="show-archived" checked={showArchived} onCheckedChange={setShowArchived} />
             <Label htmlFor="show-archived" className="text-sm">Show archived</Label>
           </div>

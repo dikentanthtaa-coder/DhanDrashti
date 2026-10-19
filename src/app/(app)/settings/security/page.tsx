@@ -15,7 +15,7 @@ export default async function SecuritySettingsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Security" description="Password and account controls." />
-      <Card>
+      <Card className="max-w-2xl">
         <CardHeader>
           <CardTitle className="text-base">Change password</CardTitle>
           <CardDescription>Changing your password signs out your other devices. Sessions expire automatically and refresh securely while you use the app.</CardDescription>
@@ -24,7 +24,7 @@ export default async function SecuritySettingsPage() {
           <ChangePasswordForm />
         </CardContent>
       </Card>
-      <Card className="border-destructive/40">
+      <Card className="max-w-2xl border-destructive/40 bg-destructive/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base text-destructive">
             <AlertTriangle className="size-4" aria-hidden="true" /> Danger zone

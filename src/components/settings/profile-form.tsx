@@ -10,7 +10,7 @@ import { updateProfileAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { TimezonePicker } from "@/components/settings/timezone-picker";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -43,8 +43,8 @@ export function ProfileForm({
   });
   const errors = form.formState.errors;
   return (
-    <form onSubmit={onSubmit} noValidate aria-busy={pending} className="max-w-lg">
-      <FieldGroup>
+    <form onSubmit={onSubmit} noValidate aria-busy={pending}>
+      <FieldGroup className="gap-5">
         <Field data-invalid={!!errors.displayName}>
           <FieldLabel htmlFor="displayName">Display name</FieldLabel>
           <Input id="displayName" autoComplete="name" aria-invalid={!!errors.displayName} {...form.register("displayName")} />
@@ -52,13 +52,11 @@ export function ProfileForm({
         </Field>
         <Field data-invalid={!!errors.timezone}>
           <FieldLabel htmlFor="timezone">Timezone</FieldLabel>
-          <NativeSelect id="timezone" aria-invalid={!!errors.timezone} {...form.register("timezone")}>
-            {timezones.map((tz) => (
-              <NativeSelectOption key={tz} value={tz}>
-                {tz}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+          <Controller
+            control={form.control}
+            name="timezone"
+            render={({ field }) => <TimezonePicker id="timezone" value={field.value} onChange={field.onChange} timezones={timezones} invalid={!!errors.timezone} />}
+          />
           <FieldDescription>Determines what “today” and “this month” mean for your dashboard, budgets and schedules.</FieldDescription>
           <FieldError errors={[errors.timezone]} />
         </Field>
@@ -67,25 +65,27 @@ export function ProfileForm({
           <Input value="INR (₹)" readOnly aria-readonly />
           <FieldDescription>Indian Rupee with Indian digit grouping (₹1,25,000.00).</FieldDescription>
         </Field>
-        <Field orientation="horizontal">
+        <Field orientation="horizontal" className="rounded-lg border bg-muted/30 px-4 py-3">
+          <div className="flex flex-1 flex-col gap-1">
+            <FieldLabel htmlFor="emailAlerts">Email me budget alerts</FieldLabel>
+            <FieldDescription>
+              {emailConfigured
+                ? "Threshold alerts are also sent to your account email."
+                : "Email delivery is not configured on this deployment. In-app alerts still work."}
+            </FieldDescription>
+          </div>
           <Controller
             control={form.control}
             name="emailAlertsEnabled"
             render={({ field }) => <Switch id="emailAlerts" checked={field.value} onCheckedChange={field.onChange} disabled={!emailConfigured} />}
           />
-          <div className="flex flex-col gap-1">
-            <FieldLabel htmlFor="emailAlerts">Email me budget alerts</FieldLabel>
-            <FieldDescription>
-              {emailConfigured
-                ? "Threshold alerts are also sent to your account email."
-                : "Email delivery is not configured on this deployment (RESEND_API_KEY and EMAIL_FROM). In-app alerts still work."}
-            </FieldDescription>
-          </div>
         </Field>
-        <Button type="submit" className="self-start" disabled={pending}>
-          {pending ? <Spinner /> : null}
-          Save profile
-        </Button>
+        <div className="flex justify-end border-t pt-4">
+          <Button type="submit" disabled={pending}>
+            {pending ? <Spinner /> : null}
+            Save profile
+          </Button>
+        </div>
       </FieldGroup>
     </form>
   );

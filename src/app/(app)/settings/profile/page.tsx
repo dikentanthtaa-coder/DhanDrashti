@@ -4,6 +4,7 @@ import { isEmailConfigured } from "@/lib/email";
 import { DEFAULT_TIMEZONE } from "@/lib/constants";
 import { PageHeader } from "@/components/common/page-header";
 import { ProfileForm } from "@/components/settings/profile-form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Profile" };
 
@@ -23,13 +24,21 @@ export default async function ProfileSettingsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Profile" description="How DhanDrashti addresses you and interprets dates." />
-      <ProfileForm
-        displayName={profile.display_name}
-        timezone={profile.timezone}
-        emailAlertsEnabled={profile.email_alerts_enabled}
-        emailConfigured={isEmailConfigured()}
-        timezones={timezoneList(profile.timezone)}
-      />
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle className="text-base">Personal details</CardTitle>
+          <CardDescription>Your name, timezone and alert preferences.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProfileForm
+            displayName={profile.display_name}
+            timezone={profile.timezone}
+            emailAlertsEnabled={profile.email_alerts_enabled}
+            emailConfigured={isEmailConfigured()}
+            timezones={timezoneList(profile.timezone)}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

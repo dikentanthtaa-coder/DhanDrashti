@@ -38,7 +38,8 @@ async function addTransaction(page: Page, opts: { type: "expense" | "income"; am
   await page.getByLabel("Category").click();
   await page.getByPlaceholder("Search categories…").fill(opts.categoryQuery);
   await page.getByRole("option", { name: opts.categoryOption }).first().click();
-  await page.getByLabel(opts.type === "expense" ? "Account" : "Account", { exact: true }).selectOption({ index: 1 });
+  await page.getByRole("combobox", { name: "Account", exact: true }).click();
+  await page.getByRole("option", { name: /Cash/ }).first().click();
   await page.getByLabel(opts.type === "expense" ? "Merchant" : "Source / payer").fill(opts.merchant);
   await page.getByRole("button", { name: new RegExp(`^Save ${opts.type}$`) }).click();
   await expect(page).toHaveURL(/\/transactions(\?|$)/);
@@ -83,10 +84,11 @@ test("register → verify → sign in → transact → budget → report → exp
   // 5. Create a budget for Food & Eating
   await go(page, "/budgets");
   await page.getByRole("button", { name: "New budget" }).first().click();
-  await page.getByLabel("Applies to").selectOption("category");
-  await page.getByLabel("Category").click();
+  await page.getByRole("combobox", { name: "Applies to" }).click();
+  await page.getByRole("option", { name: "A category" }).click();
+  await page.getByRole("dialog").getByRole("combobox", { name: "Category" }).click();
   await page.getByPlaceholder("Search categories…").fill("Food");
-  await page.getByRole("option", { name: /Food & Eating \(general\)/ }).first().click();
+  await page.getByRole("option", { name: /Food & Eating Main category/ }).first().click();
   await page.getByLabel("Monthly limit").fill("8000");
   await page.getByRole("button", { name: "Create budget" }).click();
   await expect(page.getByText(/8,000\.00/).filter({ visible: true }).first()).toBeVisible();
@@ -99,9 +101,11 @@ test("register → verify → sign in → transact → budget → report → exp
   // 7. Filter a report by date (custom range = today only) and check totals
   await go(page, "/reports?preset=today");
   await expect(page.getByText("₹650.50").filter({ visible: true }).first()).toBeVisible();
-  await page.getByLabel("Date range", { exact: true }).selectOption("last_month");
+  await page.getByRole("combobox", { name: "Date range" }).click();
+  await page.getByRole("option", { name: "Previous Month" }).click();
   await expect(page).toHaveURL(/preset=last_month/);
-  await page.getByLabel("Date range", { exact: true }).selectOption("this_month");
+  await page.getByRole("combobox", { name: "Date range" }).click();
+  await page.getByRole("option", { name: "Current Month" }).click();
 
   // 8. Export CSV (download) and verify content + formula-injection safety
   const [download] = await Promise.all([
@@ -118,10 +122,11 @@ test("register → verify → sign in → transact → budget → report → exp
   await go(page, "/recurring");
   await page.getByRole("button", { name: "New schedule" }).first().click();
   await page.getByLabel("Amount").fill("15000");
-  await page.getByLabel("Account", { exact: true }).selectOption({ index: 1 });
-  await page.getByLabel("Category").click();
+  await page.getByRole("combobox", { name: "Account", exact: true }).click();
+  await page.getByRole("option", { name: /Bank Account/ }).first().click();
+  await page.getByRole("dialog").getByRole("combobox", { name: "Category" }).click();
   await page.getByPlaceholder("Search categories…").fill("Rent");
-  await page.getByRole("option", { name: /^Rent$/ }).first().click();
+  await page.getByRole("option", { name: /^Rent in Home/ }).first().click();
   await page.getByLabel("Merchant / payee").fill("E2E Landlord");
   await page.getByRole("button", { name: "Create schedule" }).click();
   await expect(page.getByText("E2E Landlord").filter({ visible: true }).first()).toBeVisible();

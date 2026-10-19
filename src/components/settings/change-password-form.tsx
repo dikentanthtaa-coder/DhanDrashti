@@ -32,7 +32,7 @@ export function ChangePasswordForm() {
   const errors = form.formState.errors;
   return (
     <form onSubmit={onSubmit} noValidate aria-busy={pending} className="max-w-lg">
-      <FieldGroup>
+      <FieldGroup className="gap-5">
         <Field data-invalid={!!errors.currentPassword}>
           <FieldLabel htmlFor="currentPassword">Current password</FieldLabel>
           <PasswordInput id="currentPassword" autoComplete="current-password" aria-invalid={!!errors.currentPassword} {...form.register("currentPassword")} />
@@ -49,10 +49,12 @@ export function ChangePasswordForm() {
           <PasswordInput id="confirmNewPassword" autoComplete="new-password" aria-invalid={!!errors.confirmPassword} {...form.register("confirmPassword")} />
           <FieldError errors={[errors.confirmPassword]} />
         </Field>
-        <Button type="submit" className="self-start" disabled={pending}>
-          {pending ? <Spinner /> : null}
-          Update password
-        </Button>
+        <div className="flex justify-end border-t pt-4">
+          <Button type="submit" disabled={pending}>
+            {pending ? <Spinner /> : null}
+            Update password
+          </Button>
+        </div>
       </FieldGroup>
     </form>
   );

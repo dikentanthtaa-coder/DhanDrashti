@@ -27,8 +27,8 @@ export function ExpensePieChart({ data, height = 260 }: { data: PieSlice[]; heig
   const colorFor = (s: PieSlice, i: number) => s.color ?? CHART_SERIES[i % CHART_SERIES.length];
 
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-center">
-      <div className="w-full md:w-1/2">
+    <div className="flex flex-col gap-4">
+      <div className="relative mx-auto w-full max-w-[280px]">
         <ResponsiveContainer width="100%" height={height}>
           <PieChart>
             <Tooltip content={<ChartTooltipContent />} />
@@ -36,8 +36,8 @@ export function ExpensePieChart({ data, height = 260 }: { data: PieSlice[]; heig
               data={slices}
               dataKey="value"
               nameKey="name"
-              innerRadius="58%"
-              outerRadius="88%"
+              innerRadius="62%"
+              outerRadius="90%"
               paddingAngle={1.5}
               stroke="var(--card)"
               strokeWidth={2}
@@ -49,16 +49,32 @@ export function ExpensePieChart({ data, height = 260 }: { data: PieSlice[]; heig
             </Pie>
           </PieChart>
         </ResponsiveContainer>
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center" aria-hidden="true">
+          <span className="text-xs text-muted-foreground">Total</span>
+          <span className="text-lg font-semibold">{formatINR(total, { compact: true })}</span>
+        </div>
       </div>
-      <ul className="flex w-full flex-col gap-1.5 text-sm md:w-1/2" aria-label="Category breakdown">
-        {slices.map((s, i) => (
-          <li key={s.id} className="flex items-center gap-2">
-            <span className="inline-block size-2.5 shrink-0 rounded-sm" style={{ background: colorFor(s, i) }} aria-hidden="true" />
-            <span className="min-w-0 flex-1 truncate">{s.name}</span>
-            <span className="tabular text-muted-foreground">{((s.value / total) * 100).toFixed(1)}%</span>
-            <span className="tabular w-24 text-right font-medium">{formatINR(s.value)}</span>
-          </li>
-        ))}
+      <ul className="flex w-full flex-col divide-y rounded-xl border text-sm" aria-label="Category breakdown">
+        {slices.map((s, i) => {
+          const pct = (s.value / total) * 100;
+          return (
+            <li key={s.id} className="flex items-center gap-3 px-3 py-2">
+              <span className="inline-block size-3 shrink-0 rounded-sm" style={{ background: colorFor(s, i) }} aria-hidden="true" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-medium" title={s.name}>
+                  {s.name}
+                </span>
+                <span className="mt-1 block h-1.5 w-full overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                  <span className="block h-full rounded-full" style={{ width: `${Math.max(2, pct)}%`, background: colorFor(s, i) }} />
+                </span>
+              </span>
+              <span className="flex shrink-0 flex-col items-end">
+                <span className="tabular font-medium">{formatINR(s.value)}</span>
+                <span className="tabular text-xs text-muted-foreground">{pct.toFixed(1)}%</span>
+              </span>
+            </li>
+          );
+        })}
       </ul>
       <ChartDataTable caption="Expenses by category" columns={["Category", "Amount", "Share"]} rows={slices.map((s) => [s.name, formatINR(s.value), `${((s.value / total) * 100).toFixed(1)}%`])} />
     </div>

@@ -9,7 +9,7 @@ import { deleteNotificationAction, markAllNotificationsReadAction, markNotificat
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 
 const ICONS = {
   budget_alert: Target,
@@ -62,8 +62,9 @@ function NotificationItem({ notification: n }: { notification: NotificationRow }
   const link = linkFor(n);
   const unread = !n.read_at;
   return (
-    <li className={cn("flex gap-3 px-4 py-3", unread && "bg-primary/5")}>
-      <span className={cn("mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg", unread ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")} aria-hidden="true">
+    <li className={cn("group relative flex gap-3 px-4 py-3.5 transition-colors hover:bg-muted/40", unread && "bg-primary/5")}>
+      {unread ? <span className="absolute top-1/2 left-1.5 size-1.5 -translate-y-1/2 rounded-full bg-primary" aria-hidden="true" /> : null}
+      <span className={cn("mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg", unread ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")} aria-hidden="true">
         <Icon className="size-4" />
       </span>
       <div className="min-w-0 flex-1">
@@ -72,8 +73,8 @@ function NotificationItem({ notification: n }: { notification: NotificationRow }
             {unread ? <span className="sr-only">Unread: </span> : null}
             {n.title}
           </p>
-          <time dateTime={n.created_at} className="shrink-0 text-xs text-muted-foreground tabular">
-            {format(new Date(n.created_at), "d MMM yyyy, h:mm a")}
+          <time dateTime={n.created_at} title={format(new Date(n.created_at), "d MMM yyyy, h:mm a")} className="shrink-0 text-xs text-muted-foreground tabular">
+            {formatDistanceToNowStrict(new Date(n.created_at), { addSuffix: true })}
           </time>
         </div>
         <p className="mt-0.5 text-sm text-muted-foreground">{n.message}</p>

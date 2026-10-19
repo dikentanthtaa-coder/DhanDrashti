@@ -9,15 +9,16 @@ import { toast } from "sonner";
 import type { AccountRow, CategoryRow } from "@/lib/types/database";
 import { transactionSchema, type TransactionInput, type TransactionValues } from "@/lib/validation/transactions";
 import { createTransactionAction } from "@/lib/actions/transactions";
-import { ACCOUNT_TYPE_LABELS, PAYMENT_METHODS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/common/amount-input";
 import { CategorySelector } from "@/components/common/category-selector";
+import { FormSelect } from "@/components/common/form-select";
+import { accountOptions, paymentMethodOptions } from "@/components/transactions/select-options";
 
 /** Dashboard quick-add: minimal expense form in a dialog. */
 export function QuickAddExpense({ accounts, categories, today }: { accounts: AccountRow[]; categories: CategoryRow[]; today: string }) {
@@ -42,6 +43,8 @@ export function QuickAddExpense({ accounts, categories, today }: { accounts: Acc
   };
   const form = useForm<TransactionInput, unknown, TransactionValues>({ resolver: zodResolver(transactionSchema), defaultValues: defaults });
   const { errors } = form.formState;
+  const accountOpts = accountOptions(activeAccounts);
+  const methodOpts = paymentMethodOptions();
 
   const onSubmit = form.handleSubmit((values) => {
     setFormError(null);
@@ -60,7 +63,16 @@ export function QuickAddExpense({ accounts, categories, today }: { accounts: Acc
   });
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) { form.reset(defaults); setFormError(null); } }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setOpen(o);
+        if (!o) {
+          form.reset(defaults);
+          setFormError(null);
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button>
           <Plus data-icon="inline-start" /> Quick add expense
@@ -71,18 +83,22 @@ export function QuickAddExpense({ accounts, categories, today }: { accounts: Acc
           <DialogTitle>Quick add expense</DialogTitle>
           <DialogDescription>Record an expense in seconds. Add receipts or notes later from the transaction page.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} noValidate aria-busy={pending} className="flex flex-col gap-4">
-          {formError ? <p role="alert" className="text-sm text-destructive">{formError}</p> : null}
-          <FieldGroup>
-            <div className="grid grid-cols-2 gap-3">
+        <form onSubmit={onSubmit} noValidate aria-busy={pending} className="flex flex-col gap-5">
+          {formError ? (
+            <Alert variant="destructive">
+              <AlertDescription>{formError}</AlertDescription>
+            </Alert>
+          ) : null}
+          <FieldGroup className="gap-5">
+            <div className="grid grid-cols-[1.3fr_1fr] gap-3">
               <Field data-invalid={!!errors.amount}>
                 <FieldLabel htmlFor="qa-amount">Amount</FieldLabel>
-                <AmountInput id="qa-amount" autoFocus aria-invalid={!!errors.amount} {...form.register("amount")} />
+                <AmountInput id="qa-amount" autoFocus className="h-12 text-2xl font-semibold text-expense" aria-invalid={!!errors.amount} {...form.register("amount")} />
                 <FieldError errors={[errors.amount]} />
               </Field>
               <Field data-invalid={!!errors.transactionDate}>
                 <FieldLabel htmlFor="qa-date">Date</FieldLabel>
-                <Input id="qa-date" type="date" max="9999-12-31" aria-invalid={!!errors.transactionDate} {...form.register("transactionDate")} />
+                <Input id="qa-date" type="date" max="9999-12-31" className="h-12" aria-invalid={!!errors.transactionDate} {...form.register("transactionDate")} />
                 <FieldError errors={[errors.transactionDate]} />
               </Field>
             </div>
@@ -95,34 +111,28 @@ export function QuickAddExpense({ accounts, categories, today }: { accounts: Acc
               />
               <FieldError errors={[errors.categoryId]} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <Field data-invalid={!!errors.accountId}>
                 <FieldLabel htmlFor="qa-account">Account</FieldLabel>
-                <NativeSelect id="qa-account" aria-invalid={!!errors.accountId} {...form.register("accountId")}>
-                  <NativeSelectOption value="">Choose</NativeSelectOption>
-                  {activeAccounts.map((a) => (
-                    <NativeSelectOption key={a.id} value={a.id}>
-                      {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
+                <Controller
+                  control={form.control}
+                  name="accountId"
+                  render={({ field }) => <FormSelect id="qa-account" value={field.value} onValueChange={field.onChange} invalid={!!errors.accountId} options={accountOpts} placeholder="Choose an account" />}
+                />
                 <FieldError errors={[errors.accountId]} />
               </Field>
               <Field>
-                <FieldLabel htmlFor="qa-method">Method</FieldLabel>
-                <NativeSelect id="qa-method" {...form.register("paymentMethod")}>
-                  <NativeSelectOption value="">Not specified</NativeSelectOption>
-                  {PAYMENT_METHODS.map((m) => (
-                    <NativeSelectOption key={m.value} value={m.value}>
-                      {m.label}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
+                <FieldLabel htmlFor="qa-method">Payment method</FieldLabel>
+                <Controller
+                  control={form.control}
+                  name="paymentMethod"
+                  render={({ field }) => <FormSelect id="qa-method" value={field.value ?? ""} onValueChange={field.onChange} options={methodOpts} emptyLabel="Not specified" placeholder="Not specified" />}
+                />
               </Field>
             </div>
             <Field data-invalid={!!errors.merchant}>
               <FieldLabel htmlFor="qa-merchant">Merchant</FieldLabel>
-              <Input id="qa-merchant" placeholder="e.g. Zomato" autoComplete="off" {...form.register("merchant")} />
+              <Input id="qa-merchant" placeholder="e.g. Zomato" autoComplete="off" aria-invalid={!!errors.merchant} {...form.register("merchant")} />
               <FieldError errors={[errors.merchant]} />
             </Field>
           </FieldGroup>

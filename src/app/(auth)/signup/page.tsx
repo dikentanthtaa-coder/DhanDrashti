@@ -3,7 +3,11 @@ import type { Metadata } from "next";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { SignupForm } from "@/components/auth/signup-form";
 
-export const metadata: Metadata = { title: "Create account" };
+export const metadata: Metadata = {
+  title: "Create account",
+  description: "Create a free DhanDrashti account and start tracking expenses, budgets and savings in Indian rupees.",
+  alternates: { canonical: "/signup" },
+};
 
 export default function SignupPage() {
   return (

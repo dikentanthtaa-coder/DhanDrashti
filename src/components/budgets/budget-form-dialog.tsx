@@ -14,11 +14,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/common/amount-input";
 import { CategorySelector } from "@/components/common/category-selector";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { FormSelect } from "@/components/common/form-select";
+import { FormErrorBanner, PillToggle } from "@/components/settings/form-helpers";
+import { Layers, Tag } from "lucide-react";
 
 const PRESET_THRESHOLDS = [50, 75, 80, 90, 100];
 
@@ -51,7 +52,7 @@ export function BudgetFormDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{budget ? "Edit budget" : "New monthly budget"}</DialogTitle>
           <DialogDescription>
@@ -110,18 +111,19 @@ function BudgetForm({ categories, budget, defaultMonth, close }: { categories: C
 
   return (
         <form onSubmit={onSubmit} noValidate aria-busy={pending}>
-          <FieldGroup>
-            {formError ? (
-              <p role="alert" className="text-sm text-destructive">
-                {formError}
-              </p>
-            ) : null}
+          <FieldGroup className="gap-5">
+            <FormErrorBanner message={formError} />
             <Field>
               <FieldLabel htmlFor="budget-scope">Applies to</FieldLabel>
-              <NativeSelect id="budget-scope" value={scope} onChange={(e) => setScope(e.target.value as "overall" | "category")}>
-                <NativeSelectOption value="overall">Overall (all spending)</NativeSelectOption>
-                <NativeSelectOption value="category">A category</NativeSelectOption>
-              </NativeSelect>
+              <FormSelect
+                id="budget-scope"
+                value={scope}
+                onValueChange={(v) => setScope(v as "overall" | "category")}
+                options={[
+                  { value: "overall", label: "Overall (all spending)", text: "Overall (all spending)", description: "One cap for everything you spend", icon: <Layers /> },
+                  { value: "category", label: "A category", text: "A category", description: "Limit one category and its subcategories", icon: <Tag /> },
+                ]}
+              />
             </Field>
             {scope === "category" ? (
               <Field data-invalid={!!errors.categoryId}>
@@ -146,10 +148,10 @@ function BudgetForm({ categories, budget, defaultMonth, close }: { categories: C
             ) : null}
             <Field data-invalid={!!errors.amountLimit}>
               <FieldLabel htmlFor="budget-amount">Monthly limit</FieldLabel>
-              <AmountInput id="budget-amount" aria-invalid={!!errors.amountLimit} {...form.register("amountLimit")} />
+              <AmountInput id="budget-amount" className="h-12 text-xl font-semibold" aria-invalid={!!errors.amountLimit} {...form.register("amountLimit")} />
               <FieldError errors={[errors.amountLimit]} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field data-invalid={!!errors.periodStart}>
                 <FieldLabel htmlFor="budget-start">Start month</FieldLabel>
                 <Controller
@@ -182,44 +184,42 @@ function BudgetForm({ categories, budget, defaultMonth, close }: { categories: C
                   .map((t) => {
                     const checked = (thresholds as number[]).map(Number).includes(t);
                     return (
-                      <label key={t} className="flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-sm has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/10">
-                        <Checkbox checked={checked} onCheckedChange={(v) => toggleThreshold(t, v === true)} aria-label={`${t} percent`} />
+                      <PillToggle key={t} pressed={checked} onPressedChange={(v) => toggleThreshold(t, v)} ariaLabel={`${t} percent`}>
                         {t}%
-                      </label>
+                      </PillToggle>
                     );
                   })}
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={200}
-                    value={customThreshold}
-                    onChange={(e) => setCustomThreshold(e.target.value)}
-                    placeholder="Custom %"
-                    className="w-24"
-                    aria-label="Custom threshold percent"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      const n = Number(customThreshold);
-                      if (Number.isInteger(n) && n >= 1 && n <= 200) {
-                        toggleThreshold(n, true);
-                        setCustomThreshold("");
-                      }
-                    }}
-                  >
-                    Add
-                  </Button>
-                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={customThreshold}
+                  onChange={(e) => setCustomThreshold(e.target.value)}
+                  placeholder="Custom %"
+                  className="w-28"
+                  aria-label="Custom threshold percent"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const n = Number(customThreshold);
+                    if (Number.isInteger(n) && n >= 1 && n <= 200) {
+                      toggleThreshold(n, true);
+                      setCustomThreshold("");
+                    }
+                  }}
+                >
+                  Add threshold
+                </Button>
               </div>
               <FieldDescription>Each threshold alerts once per month. Up to 5 thresholds.</FieldDescription>
               <FieldError errors={[errors.alertThresholds as { message?: string } | undefined]} />
             </Field>
           </FieldGroup>
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-6 gap-2">
             <Button type="button" variant="outline" onClick={close} disabled={pending}>
               Cancel
             </Button>

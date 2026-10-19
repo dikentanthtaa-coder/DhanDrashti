@@ -11,15 +11,14 @@ import { createRecurringAction, updateRecurringAction } from "@/lib/actions/recu
 import { anchorDayFor, upcomingDates } from "@/lib/finance/recurring";
 import { isValidDateString } from "@/lib/finance/dates";
 import { formatDisplayDate } from "@/lib/format";
-import { ACCOUNT_TYPE_LABELS, FREQUENCIES, PAYMENT_METHODS, TRANSACTION_TYPES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { FormSelect } from "@/components/common/form-select";
+import { accountOptions, frequencyOptions, paymentMethodOptions, FormErrorBanner, SegmentedChoice } from "@/components/settings/form-helpers";
+import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, BellRing, Zap } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/common/amount-input";
 import { CategorySelector } from "@/components/common/category-selector";
@@ -137,76 +136,74 @@ function RecurringForm({
   });
 
   const errors = form.formState.errors;
+  const accountOpts = accountOptions(active);
   const monthEndNote = isValidDateString(startDate) && anchorDayFor(startDate) > 28 && (frequency === "monthly" || frequency === "yearly");
 
   return (
         <form onSubmit={onSubmit} noValidate aria-busy={pending}>
-          <FieldGroup>
-            {formError ? (
-              <p role="alert" className="text-sm text-destructive">
-                {formError}
-              </p>
-            ) : null}
+          <FieldGroup className="gap-5">
+            <FormErrorBanner message={formError} />
             <Field>
               <FieldLabel>Type</FieldLabel>
               <Controller
                 control={form.control}
                 name="transactionType"
                 render={({ field }) => (
-                  <RadioGroup value={field.value} onValueChange={field.onChange} className="grid grid-cols-3 gap-2">
-                    {TRANSACTION_TYPES.map((t) => (
-                      <Label key={t.value} htmlFor={`rt-type-${t.value}`} className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/10">
-                        <RadioGroupItem id={`rt-type-${t.value}`} value={t.value} />
-                        {t.label}
-                      </Label>
-                    ))}
-                  </RadioGroup>
+                  <SegmentedChoice
+                    idPrefix="rt-type"
+                    aria-label="Transaction type"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={[
+                      { value: "expense", label: "Expense", icon: <ArrowDownRight />, activeClassName: "border-expense bg-expense/10 text-expense" },
+                      { value: "income", label: "Income", icon: <ArrowUpRight />, activeClassName: "border-income bg-income/10 text-income" },
+                      { value: "transfer", label: "Transfer", icon: <ArrowLeftRight />, activeClassName: "border-transfer bg-transfer/10 text-transfer" },
+                    ]}
+                  />
                 )}
               />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field data-invalid={!!errors.amount}>
                 <FieldLabel htmlFor="rt-amount">Amount</FieldLabel>
-                <AmountInput id="rt-amount" aria-invalid={!!errors.amount} {...form.register("amount")} />
+                <AmountInput id="rt-amount" className="h-12 text-xl font-semibold" aria-invalid={!!errors.amount} {...form.register("amount")} />
                 <FieldError errors={[errors.amount]} />
               </Field>
               <Field data-invalid={!!errors.frequency}>
                 <FieldLabel htmlFor="rt-frequency">Frequency</FieldLabel>
-                <NativeSelect id="rt-frequency" {...form.register("frequency")}>
-                  {FREQUENCIES.map((f) => (
-                    <NativeSelectOption key={f.value} value={f.value}>
-                      {f.label}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
+                <Controller
+                  control={form.control}
+                  name="frequency"
+                  render={({ field }) => <FormSelect id="rt-frequency" value={field.value} onValueChange={field.onChange} invalid={!!errors.frequency} options={frequencyOptions()} className="h-12" />}
+                />
                 <FieldError errors={[errors.frequency]} />
               </Field>
             </div>
-            <Field data-invalid={!!errors.accountId}>
-              <FieldLabel htmlFor="rt-account">{type === "transfer" ? "From account" : "Account"}</FieldLabel>
-              <NativeSelect id="rt-account" aria-invalid={!!errors.accountId} {...form.register("accountId")}>
-                {active.map((a) => (
-                  <NativeSelectOption key={a.id} value={a.id}>
-                    {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-              <FieldError errors={[errors.accountId]} />
-            </Field>
-            {type === "transfer" ? (
-              <Field data-invalid={!!errors.toAccountId}>
-                <FieldLabel htmlFor="rt-to">To account</FieldLabel>
-                <NativeSelect id="rt-to" aria-invalid={!!errors.toAccountId} {...form.register("toAccountId")}>
-                  <NativeSelectOption value="">Choose…</NativeSelectOption>
-                  {active.map((a) => (
-                    <NativeSelectOption key={a.id} value={a.id}>
-                      {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-                <FieldError errors={[errors.toAccountId]} />
+            <div className={type === "transfer" ? "grid gap-4 sm:grid-cols-2" : "grid gap-4"}>
+              <Field data-invalid={!!errors.accountId}>
+                <FieldLabel htmlFor="rt-account">{type === "transfer" ? "From account" : "Account"}</FieldLabel>
+                <Controller
+                  control={form.control}
+                  name="accountId"
+                  render={({ field }) => <FormSelect id="rt-account" value={field.value} onValueChange={field.onChange} invalid={!!errors.accountId} options={accountOpts} placeholder="Choose an account" />}
+                />
+                <FieldError errors={[errors.accountId]} />
               </Field>
-            ) : (
+              {type === "transfer" ? (
+                <Field data-invalid={!!errors.toAccountId}>
+                  <FieldLabel htmlFor="rt-to">To account</FieldLabel>
+                  <Controller
+                    control={form.control}
+                    name="toAccountId"
+                    render={({ field }) => (
+                      <FormSelect id="rt-to" value={field.value ?? ""} onValueChange={field.onChange} invalid={!!errors.toAccountId} options={accountOpts.filter((o) => o.value !== form.watch("accountId"))} placeholder="Choose the destination" />
+                    )}
+                  />
+                  <FieldError errors={[errors.toAccountId]} />
+                </Field>
+              ) : null}
+            </div>
+            {type === "transfer" ? null : (
               <Field data-invalid={!!errors.categoryId}>
                 <FieldLabel htmlFor="rt-category">Category</FieldLabel>
                 <Controller
@@ -219,7 +216,7 @@ function RecurringForm({
                 <FieldError errors={[errors.categoryId]} />
               </Field>
             )}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Field data-invalid={!!errors.startDate}>
                 <FieldLabel htmlFor="rt-start">Start date</FieldLabel>
                 <Input
@@ -254,12 +251,19 @@ function RecurringForm({
               </Field>
             </div>
             {preview.length > 0 ? (
-              <div className="rounded-lg bg-muted/60 px-3 py-2 text-xs">
-                <span className="font-medium">Upcoming:</span> {preview.map((d) => formatDisplayDate(d)).join(" · ")}
-                {monthEndNote ? <span className="block text-muted-foreground">Months without day {anchorDayFor(startDate)} use their last day.</span> : null}
+              <div className="rounded-lg border border-dashed bg-muted/40 px-3 py-2.5 text-xs">
+                <span className="font-medium">Upcoming dates:</span>
+                <span className="mt-1 flex flex-wrap gap-1.5">
+                  {preview.map((d) => (
+                    <span key={d} className="rounded-md bg-background px-2 py-0.5 tabular ring-1 ring-foreground/10">
+                      {formatDisplayDate(d)}
+                    </span>
+                  ))}
+                </span>
+                {monthEndNote ? <span className="mt-1 block text-muted-foreground">Months without day {anchorDayFor(startDate)} use their last day.</span> : null}
               </div>
             ) : null}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field data-invalid={!!errors.merchant}>
                 <FieldLabel htmlFor="rt-merchant">Merchant / payee</FieldLabel>
                 <Input id="rt-merchant" placeholder="Landlord, Airtel…" aria-invalid={!!errors.merchant} {...form.register("merchant")} />
@@ -267,14 +271,11 @@ function RecurringForm({
               </Field>
               <Field data-invalid={!!errors.paymentMethod}>
                 <FieldLabel htmlFor="rt-method">Payment method</FieldLabel>
-                <NativeSelect id="rt-method" {...form.register("paymentMethod")}>
-                  <NativeSelectOption value="">Not set</NativeSelectOption>
-                  {PAYMENT_METHODS.map((m) => (
-                    <NativeSelectOption key={m.value} value={m.value}>
-                      {m.label}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
+                <Controller
+                  control={form.control}
+                  name="paymentMethod"
+                  render={({ field }) => <FormSelect id="rt-method" value={field.value ?? ""} onValueChange={field.onChange} invalid={!!errors.paymentMethod} options={paymentMethodOptions()} emptyLabel="Not set" placeholder="Not set" />}
+                />
                 <FieldError errors={[errors.paymentMethod]} />
               </Field>
             </div>
@@ -289,28 +290,23 @@ function RecurringForm({
                 control={form.control}
                 name="postingMode"
                 render={({ field }) => (
-                  <RadioGroup value={field.value} onValueChange={field.onChange} className="gap-2">
-                    <Label htmlFor="rt-mode-auto" className="flex cursor-pointer items-start gap-2 rounded-lg border px-3 py-2 text-sm font-normal has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/10">
-                      <RadioGroupItem id="rt-mode-auto" value="auto_post" className="mt-0.5" />
-                      <span>
-                        <span className="font-medium">Auto-post</span>
-                        <span className="block text-xs text-muted-foreground">Creates the transaction automatically on the due date.</span>
-                      </span>
-                    </Label>
-                    <Label htmlFor="rt-mode-reminder" className="flex cursor-pointer items-start gap-2 rounded-lg border px-3 py-2 text-sm font-normal has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/10">
-                      <RadioGroupItem id="rt-mode-reminder" value="reminder" className="mt-0.5" />
-                      <span>
-                        <span className="font-medium">Reminder</span>
-                        <span className="block text-xs text-muted-foreground">Sends a notification and asks you to confirm or skip each occurrence.</span>
-                      </span>
-                    </Label>
-                  </RadioGroup>
+                  <SegmentedChoice
+                    idPrefix="rt-mode"
+                    aria-label="Posting mode"
+                    columns={1}
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={[
+                      { value: "auto_post", label: "Auto-post", description: "Creates the transaction automatically on the due date.", icon: <Zap /> },
+                      { value: "reminder", label: "Reminder", description: "Sends a notification and asks you to confirm or skip each occurrence.", icon: <BellRing /> },
+                    ]}
+                  />
                 )}
               />
               <FieldDescription>Due occurrences are generated by the daily scheduler or when you press “Process due now”.</FieldDescription>
             </Field>
           </FieldGroup>
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-6 gap-2">
             <Button type="button" variant="outline" onClick={close} disabled={pending}>
               Cancel
             </Button>

@@ -8,10 +8,24 @@ import { APP_DESCRIPTION, APP_NAME } from "@/lib/constants";
 const geistSans = Geist({ variable: "--font-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
+  metadataBase: new URL(siteUrl),
+  title: { default: `${APP_NAME} · Personal finance tracker in ₹`, template: `%s · ${APP_NAME}` },
   description: APP_DESCRIPTION,
   applicationName: APP_NAME,
+  keywords: ["expense tracker", "budget app India", "personal finance", "savings planner", "INR expense manager", "DhanDrashti"],
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: `${APP_NAME} · Personal finance tracker in ₹`,
+    description: APP_DESCRIPTION,
+    url: siteUrl,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: `${APP_NAME} dashboard preview` }],
+    locale: "en_IN",
+  },
+  twitter: { card: "summary_large_image", title: APP_NAME, description: APP_DESCRIPTION, images: ["/og.png"] },
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "default", title: APP_NAME },
   formatDetection: { telephone: false },
@@ -19,7 +33,7 @@ export const metadata: Metadata = {
     icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
   },
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
 };
 
 /**

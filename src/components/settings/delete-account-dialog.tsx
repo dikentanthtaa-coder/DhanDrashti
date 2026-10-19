@@ -44,7 +44,7 @@ export function DeleteAccountDialog({ enabled }: { enabled: boolean }) {
           <Trash2 data-icon="inline-start" /> Delete my account
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Delete your account permanently?</DialogTitle>
           <DialogDescription>
@@ -53,7 +53,7 @@ export function DeleteAccountDialog({ enabled }: { enabled: boolean }) {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} noValidate aria-busy={pending}>
-          <FieldGroup>
+          <FieldGroup className="gap-5">
             <Field data-invalid={!!errors.confirmation}>
               <FieldLabel htmlFor="delete-confirm">
                 Type <span className="font-mono">DELETE</span> to confirm
@@ -67,7 +67,7 @@ export function DeleteAccountDialog({ enabled }: { enabled: boolean }) {
               <FieldError errors={[errors.password]} />
             </Field>
           </FieldGroup>
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-6 gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={pending}>
               Keep my account
             </Button>

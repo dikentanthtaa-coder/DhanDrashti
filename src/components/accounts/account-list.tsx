@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, Landmark, Pencil, PiggyBank, Power, Trash2, Wallet, CircleDollarSign } from "lucide-react";
+import { Pencil, Power, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { AccountBalance, AccountRow, AccountType } from "@/lib/types/database";
 import { deleteAccountRecordAction, setAccountActiveAction } from "@/lib/actions/accounts";
@@ -13,15 +13,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/common/confirmation-dialog";
 import { AccountFormDialog } from "@/components/accounts/account-form-dialog";
+import { ACCOUNT_TYPE_ICONS } from "@/components/transactions/select-options";
 import { cn } from "@/lib/utils";
 
-const TYPE_ICONS: Record<AccountType, React.ComponentType<{ className?: string }>> = {
-  cash: Wallet,
-  bank: Landmark,
-  savings: PiggyBank,
-  credit_card: CreditCard,
-  other: CircleDollarSign,
-};
+const TYPE_ICONS = ACCOUNT_TYPE_ICONS;
 
 export function AccountList({ accounts, balances }: { accounts: AccountRow[]; balances: AccountBalance[] }) {
   const router = useRouter();
@@ -59,15 +54,20 @@ export function AccountList({ accounts, balances }: { accounts: AccountRow[]; ba
                 const bal = balanceOf.get(a.id) ?? 0;
                 const owed = type === "credit_card" && bal < 0;
                 return (
-                  <Card key={a.id} className={cn("gap-2 py-4", !a.is_active && "opacity-60")} data-pending={pending || undefined}>
+                  <Card key={a.id} className={cn("gap-2 py-4 transition-shadow hover:shadow-md", !a.is_active && "opacity-60")} data-pending={pending || undefined}>
                     <CardContent className="flex flex-col gap-3 px-4">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
+                        <div className="flex min-w-0 items-start gap-3">
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
+                            <Icon className="size-5" />
+                          </span>
+                          <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
                             <span className="truncate font-medium">{a.name}</span>
                             {!a.is_active ? <Badge variant="outline" className="text-[10px]">Inactive</Badge> : null}
                           </div>
                           <div className="text-xs text-muted-foreground">Opening {formatINR(a.opening_balance)}</div>
+                          </div>
                         </div>
                         <div className="text-right">
                           <div className={cn("tabular text-lg font-semibold", owed ? "text-expense" : bal < 0 ? "text-status-critical" : "")}>{owed ? formatINR(-bal) : formatINR(bal)}</div>

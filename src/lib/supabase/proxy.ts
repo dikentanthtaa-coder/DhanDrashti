@@ -13,6 +13,9 @@ export const PUBLIC_ROUTES = new Set<string>([
   "/auth/error",
   "/~offline",
   "/manifest.webmanifest",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/og.png",
   "/privacy",
 ]);
 

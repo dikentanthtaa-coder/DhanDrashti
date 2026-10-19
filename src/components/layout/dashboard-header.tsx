@@ -7,7 +7,7 @@ import { APP_NAME } from "@/lib/constants";
 
 export function DashboardHeader({ name, email, unreadCount }: { name: string; email: string; unreadCount: number }) {
   return (
-    <header className="no-print sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur lg:px-6">
+    <header className="no-print sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-background/90 px-4 backdrop-blur lg:px-8">
       <Link href="/dashboard" className="flex items-center gap-2 font-semibold lg:hidden" aria-label={`${APP_NAME} dashboard`}>
         <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground" aria-hidden="true">
           ₹

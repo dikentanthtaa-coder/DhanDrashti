@@ -31,6 +31,9 @@ const nextConfig: NextConfig = {
       // Receipt uploads go through a server action (validated server-side).
       bodySizeLimit: "6mb",
     },
+    // Client router cache: switching between tabs reuses the last render for a
+    // short time instead of re-fetching; mutations call revalidatePath/refresh.
+    staleTimes: { dynamic: 30, static: 180 },
   },
   turbopack: {
     rules: {

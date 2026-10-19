@@ -10,15 +10,19 @@ import { Badge } from "@/components/ui/badge";
 export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
   return (
-    <aside className="no-print hidden w-60 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex" aria-label="Primary">
-      <div className="flex h-14 items-center gap-2 border-b px-4">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground" aria-hidden="true">
+    <aside
+      className="no-print sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex"
+      aria-label="Primary"
+    >
+      <div className="flex h-16 items-center gap-2.5 border-b px-5">
+        <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-lg font-semibold text-primary-foreground shadow-sm" aria-hidden="true">
           ₹
         </span>
-        <span className="font-semibold">{APP_NAME}</span>
+        <span className="text-lg font-semibold tracking-tight">{APP_NAME}</span>
       </div>
-      <nav className="flex-1 overflow-y-auto p-2">
-        <ul className="flex flex-col gap-0.5">
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">Menu</p>
+        <ul className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
             const active = isActivePath(pathname, item.href);
             return (
@@ -27,13 +31,13 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                    "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+                      ? "bg-primary/10 text-primary before:absolute before:top-2 before:bottom-2 before:left-0 before:w-0.5 before:rounded-full before:bg-primary"
+                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
-                  <item.icon className="size-4" aria-hidden="true" />
+                  <item.icon className={cn("size-[18px]", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} aria-hidden="true" />
                   <span className="flex-1">{item.label}</span>
                   {item.href === "/notifications" && unreadCount > 0 ? (
                     <Badge variant="secondary" className="h-5 min-w-5 justify-center px-1.5 text-xs" aria-label={`${unreadCount} unread`}>
@@ -46,7 +50,7 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
           })}
         </ul>
       </nav>
-      <div className="border-t p-3 text-xs text-muted-foreground">Amounts in ₹ · Private to your account</div>
+      <div className="border-t px-5 py-3 text-xs text-muted-foreground">Amounts in ₹ · Private to your account</div>
     </aside>
   );
 }

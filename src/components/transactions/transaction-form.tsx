@@ -5,27 +5,46 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Paperclip, RotateCcw, Target } from "lucide-react";
 import type { AccountRow, CategoryRow, SavingsGoalRow, TransactionRow, TransactionType } from "@/lib/types/database";
 import { transactionSchema, type TransactionInput, type TransactionValues } from "@/lib/validation/transactions";
 import { createTransactionAction, updateTransactionAction } from "@/lib/actions/transactions";
-import { PAYMENT_METHODS, ACCOUNT_TYPE_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/common/amount-input";
 import { CategorySelector } from "@/components/common/category-selector";
+import { FormSelect } from "@/components/common/form-select";
 import { ReceiptUploader } from "@/components/transactions/receipt-uploader";
+import { accountOptions, paymentMethodOptions } from "@/components/transactions/select-options";
 import { cn } from "@/lib/utils";
 
-const TYPE_OPTIONS: { value: TransactionType; label: string; className: string }[] = [
-  { value: "expense", label: "Expense", className: "data-[active=true]:bg-expense/10 data-[active=true]:text-expense data-[active=true]:border-expense/40" },
-  { value: "income", label: "Income", className: "data-[active=true]:bg-income/10 data-[active=true]:text-income data-[active=true]:border-income/40" },
-  { value: "transfer", label: "Transfer", className: "data-[active=true]:bg-transfer/10 data-[active=true]:text-transfer data-[active=true]:border-transfer/40" },
+const TYPE_OPTIONS: { value: TransactionType; label: string; hint: string; icon: React.ComponentType<{ className?: string }>; className: string }[] = [
+  {
+    value: "expense",
+    label: "Expense",
+    hint: "Money going out",
+    icon: ArrowDownRight,
+    className: "data-[active=true]:border-expense/50 data-[active=true]:bg-expense/10 data-[active=true]:text-expense",
+  },
+  {
+    value: "income",
+    label: "Income",
+    hint: "Money coming in",
+    icon: ArrowUpRight,
+    className: "data-[active=true]:border-income/50 data-[active=true]:bg-income/10 data-[active=true]:text-income",
+  },
+  {
+    value: "transfer",
+    label: "Transfer",
+    hint: "Between your accounts",
+    icon: ArrowLeftRight,
+    className: "data-[active=true]:border-transfer/50 data-[active=true]:bg-transfer/10 data-[active=true]:text-transfer",
+  },
 ];
 
 export interface TransactionFormProps {
@@ -135,6 +154,10 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
   });
 
   const listId = React.useId();
+  const accountOpts = React.useMemo(() => accountOptions(activeAccounts), [activeAccounts]);
+  const toAccountOpts = React.useMemo(() => accountOptions(activeAccounts.filter((a) => a.id !== accountId)), [activeAccounts, accountId]);
+  const methodOpts = React.useMemo(() => paymentMethodOptions(), []);
+  const goalOpts = React.useMemo(() => goals.map((g) => ({ value: g.id, label: g.name, icon: <Target className="text-muted-foreground" /> })), [goals]);
 
   return (
     <form onSubmit={onSubmit} noValidate aria-busy={pending} className="flex flex-col gap-6">
@@ -144,7 +167,7 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
         </Alert>
       ) : null}
 
-      <div role="radiogroup" aria-label="Transaction type" className="grid grid-cols-3 gap-2">
+      <div role="radiogroup" aria-label="Transaction type" className="grid grid-cols-3 gap-2 rounded-xl bg-muted/50 p-1.5">
         {TYPE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
@@ -155,25 +178,34 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
             onClick={() => setType(opt.value)}
             disabled={pending}
             className={cn(
-              "rounded-lg border px-3 py-2 text-sm font-medium transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
+              "flex flex-col items-center gap-0.5 rounded-lg border border-transparent px-2 py-2.5 text-sm font-medium text-muted-foreground transition-colors outline-none hover:bg-background/70 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:flex-row sm:justify-center sm:gap-2",
+              "data-[active=true]:bg-background data-[active=true]:shadow-xs",
               opt.className
             )}
           >
-            {opt.label}
+            <opt.icon className="size-4" aria-hidden="true" />
+            <span>{opt.label}</span>
+            <span className="hidden text-xs font-normal text-muted-foreground lg:inline">· {opt.hint}</span>
           </button>
         ))}
       </div>
 
-      <FieldGroup>
-        <div className={cn("grid gap-4", !compact && "sm:grid-cols-2")}>
+      <FieldGroup className="gap-5">
+        <div className={cn("grid gap-5", !compact && "sm:grid-cols-[1.4fr_1fr]")}>
           <Field data-invalid={!!errors.amount}>
             <FieldLabel htmlFor="amount">Amount</FieldLabel>
-            <AmountInput id="amount" aria-invalid={!!errors.amount} autoFocus={!transaction} {...form.register("amount")} />
+            <AmountInput
+              id="amount"
+              aria-invalid={!!errors.amount}
+              autoFocus={!transaction}
+              className={cn("h-12 text-2xl font-semibold", type === "expense" && !isRefund ? "text-expense" : type === "income" || isRefund ? "text-income" : "text-transfer")}
+              {...form.register("amount")}
+            />
             <FieldError errors={[errors.amount]} />
           </Field>
           <Field data-invalid={!!errors.transactionDate}>
             <FieldLabel htmlFor="transactionDate">Date</FieldLabel>
-            <Input id="transactionDate" type="date" max="9999-12-31" aria-invalid={!!errors.transactionDate} {...form.register("transactionDate")} />
+            <Input id="transactionDate" type="date" max="9999-12-31" className="h-12" aria-invalid={!!errors.transactionDate} {...form.register("transactionDate")} />
             <FieldError errors={[errors.transactionDate]} />
           </Field>
         </div>
@@ -185,52 +217,55 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
               control={form.control}
               name="categoryId"
               render={({ field }) => (
-                <CategorySelector id="categoryId" categories={categories} type={type === "income" ? "income" : "expense"} value={field.value || null} onChange={(v) => field.onChange(v ?? "")} invalid={!!errors.categoryId} disabled={pending} />
+                <CategorySelector
+                  id="categoryId"
+                  categories={categories}
+                  type={type === "income" ? "income" : "expense"}
+                  value={field.value || null}
+                  onChange={(v) => field.onChange(v ?? "")}
+                  invalid={!!errors.categoryId}
+                  disabled={pending}
+                />
               )}
             />
             <FieldError errors={[errors.categoryId]} />
           </Field>
         ) : null}
 
-        <div className={cn("grid gap-4", !compact && "sm:grid-cols-2")}>
+        <div className={cn("grid gap-5", !compact && "sm:grid-cols-2")}>
           <Field data-invalid={!!errors.accountId}>
             <FieldLabel htmlFor="accountId">{type === "transfer" ? "From account" : "Account"}</FieldLabel>
-            <NativeSelect id="accountId" aria-invalid={!!errors.accountId} {...form.register("accountId")}>
-              <NativeSelectOption value="">Choose an account</NativeSelectOption>
-              {activeAccounts.map((a) => (
-                <NativeSelectOption key={a.id} value={a.id}>
-                  {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+            <Controller
+              control={form.control}
+              name="accountId"
+              render={({ field }) => (
+                <FormSelect id="accountId" value={field.value} onValueChange={field.onChange} invalid={!!errors.accountId} disabled={pending} options={accountOpts} placeholder="Choose an account" />
+              )}
+            />
             <FieldError errors={[errors.accountId]} />
           </Field>
           {type === "transfer" ? (
             <Field data-invalid={!!errors.toAccountId}>
               <FieldLabel htmlFor="toAccountId">To account</FieldLabel>
-              <NativeSelect id="toAccountId" aria-invalid={!!errors.toAccountId} {...form.register("toAccountId")}>
-                <NativeSelectOption value="">Choose an account</NativeSelectOption>
-                {activeAccounts
-                  .filter((a) => a.id !== accountId)
-                  .map((a) => (
-                    <NativeSelectOption key={a.id} value={a.id}>
-                      {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                    </NativeSelectOption>
-                  ))}
-              </NativeSelect>
+              <Controller
+                control={form.control}
+                name="toAccountId"
+                render={({ field }) => (
+                  <FormSelect id="toAccountId" value={field.value ?? ""} onValueChange={field.onChange} invalid={!!errors.toAccountId} disabled={pending} options={toAccountOpts} placeholder="Choose an account" />
+                )}
+              />
               <FieldError errors={[errors.toAccountId]} />
             </Field>
           ) : (
             <Field data-invalid={!!errors.paymentMethod}>
               <FieldLabel htmlFor="paymentMethod">Payment method</FieldLabel>
-              <NativeSelect id="paymentMethod" {...form.register("paymentMethod")}>
-                <NativeSelectOption value="">Not specified</NativeSelectOption>
-                {PAYMENT_METHODS.map((m) => (
-                  <NativeSelectOption key={m.value} value={m.value}>
-                    {m.label}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+              <Controller
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormSelect id="paymentMethod" value={field.value ?? ""} onValueChange={field.onChange} disabled={pending} options={methodOpts} emptyLabel="Not specified" placeholder="Not specified" />
+                )}
+              />
               <FieldError errors={[errors.paymentMethod]} />
             </Field>
           )}
@@ -238,7 +273,14 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
 
         <Field data-invalid={!!errors.merchant}>
           <FieldLabel htmlFor="merchant">{type === "income" ? "Source / payer" : type === "transfer" ? "Reference" : "Merchant"}</FieldLabel>
-          <Input id="merchant" list={listId} autoComplete="off" placeholder={type === "expense" ? "e.g. Big Bazaar" : type === "income" ? "e.g. Acme Pvt Ltd" : "e.g. Monthly savings"} aria-invalid={!!errors.merchant} {...form.register("merchant")} />
+          <Input
+            id="merchant"
+            list={listId}
+            autoComplete="off"
+            placeholder={type === "expense" ? "e.g. Big Bazaar" : type === "income" ? "e.g. Acme Pvt Ltd" : "e.g. Monthly savings"}
+            aria-invalid={!!errors.merchant}
+            {...form.register("merchant")}
+          />
           <datalist id={listId}>
             {merchants.map((m) => (
               <option key={m} value={m} />
@@ -248,15 +290,19 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
         </Field>
 
         {type === "expense" ? (
-          <Field orientation="horizontal" data-invalid={!!errors.isRefund}>
-            <Controller
-              control={form.control}
-              name="isRefund"
-              render={({ field }) => <Checkbox id="isRefund" checked={!!field.value} onCheckedChange={(v) => field.onChange(v === true)} disabled={pending} />}
-            />
-            <div className="flex flex-col gap-0.5">
-              <FieldLabel htmlFor="isRefund">This is a refund</FieldLabel>
-              <FieldDescription>A refund reduces spending in this category and returns money to the account.</FieldDescription>
+          <Field data-invalid={!!errors.isRefund} className="rounded-xl border bg-muted/30 p-4">
+            <div className="flex items-start gap-3">
+              <Controller
+                control={form.control}
+                name="isRefund"
+                render={({ field }) => <Checkbox id="isRefund" className="mt-0.5" checked={!!field.value} onCheckedChange={(v) => field.onChange(v === true)} disabled={pending} />}
+              />
+              <div className="flex flex-col gap-1">
+                <FieldLabel htmlFor="isRefund" className="flex items-center gap-1.5">
+                  <RotateCcw className="size-3.5 text-muted-foreground" aria-hidden="true" /> This is a refund
+                </FieldLabel>
+                <FieldDescription>A refund reduces spending in this category and returns money to the account.</FieldDescription>
+              </div>
             </div>
           </Field>
         ) : null}
@@ -264,14 +310,13 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
         {type !== "expense" && goals.length > 0 ? (
           <Field data-invalid={!!errors.savingsGoalId}>
             <FieldLabel htmlFor="savingsGoalId">Savings goal (optional)</FieldLabel>
-            <NativeSelect id="savingsGoalId" {...form.register("savingsGoalId")}>
-              <NativeSelectOption value="">Not linked to a goal</NativeSelectOption>
-              {goals.map((g) => (
-                <NativeSelectOption key={g.id} value={g.id}>
-                  {g.name}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+            <Controller
+              control={form.control}
+              name="savingsGoalId"
+              render={({ field }) => (
+                <FormSelect id="savingsGoalId" value={field.value ?? ""} onValueChange={field.onChange} disabled={pending} options={goalOpts} emptyLabel="Not linked to a goal" placeholder="Not linked to a goal" />
+              )}
+            />
             <FieldDescription>Counts this {type} as a contribution toward the goal.</FieldDescription>
             <FieldError errors={[errors.savingsGoalId]} />
           </Field>
@@ -280,15 +325,17 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
         {!compact ? (
           <Field data-invalid={!!errors.note}>
             <FieldLabel htmlFor="note">Description</FieldLabel>
-            <Textarea id="note" rows={2} placeholder="Optional note" aria-invalid={!!errors.note} {...form.register("note")} />
+            <Textarea id="note" rows={2} placeholder="Optional note — what was this for?" aria-invalid={!!errors.note} {...form.register("note")} />
             <FieldError errors={[errors.note]} />
           </Field>
         ) : null}
       </FieldGroup>
 
       {!compact ? (
-        <div className="rounded-lg border p-4">
-          <h3 className="text-sm font-medium">Receipt</h3>
+        <div className="rounded-xl border bg-muted/30 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-medium">
+            <Paperclip className="size-4 text-muted-foreground" aria-hidden="true" /> Receipt
+          </h3>
           {savedId ? (
             <ReceiptUploader transactionId={savedId} receiptPath={transaction?.receipt_path ?? null} />
           ) : (
@@ -297,7 +344,7 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
         </div>
       ) : null}
 
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+      <div className="sticky bottom-20 z-10 -mx-4 flex flex-col-reverse gap-2 border-t bg-card/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:items-center sm:justify-end sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none lg:bottom-0">
         {!transaction && !onSaved ? (
           <label className="mr-auto flex items-center gap-2 text-sm text-muted-foreground">
             <Checkbox checked={addAnother} onCheckedChange={(v) => setAddAnother(v === true)} />
@@ -307,7 +354,7 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
         <Button type="button" variant="outline" onClick={() => (onSaved ? onSaved("") : router.back())} disabled={pending}>
           Cancel
         </Button>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending} className="min-w-36">
           {pending ? <Spinner /> : null}
           {transaction ? "Save changes" : isRefund ? "Save refund" : `Save ${type}`}
         </Button>

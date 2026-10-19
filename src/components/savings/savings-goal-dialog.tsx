@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -13,10 +13,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { FormSelect } from "@/components/common/form-select";
+import { accountOptions, FormErrorBanner } from "@/components/settings/form-helpers";
+import { Archive, CheckCircle2, CirclePlay } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/common/amount-input";
-import { ACCOUNT_TYPE_LABELS } from "@/lib/constants";
 
 type Values = z.output<typeof savingsGoalSchema>;
 
@@ -40,7 +41,7 @@ export function SavingsGoalDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{goal ? "Edit goal" : "New savings goal"}</DialogTitle>
           <DialogDescription>Progress is the sum of transfers you tag with this goal — not your account balance.</DialogDescription>
@@ -91,21 +92,17 @@ function GoalForm({ accounts, goal, close }: { accounts: AccountRow[]; goal: Sav
 
   return (
         <form onSubmit={onSubmit} noValidate aria-busy={pending}>
-          <FieldGroup>
-            {formError ? (
-              <p role="alert" className="text-sm text-destructive">
-                {formError}
-              </p>
-            ) : null}
+          <FieldGroup className="gap-5">
+            <FormErrorBanner message={formError} />
             <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="goal-name">Goal name</FieldLabel>
               <Input id="goal-name" placeholder="Emergency fund" aria-invalid={!!errors.name} {...form.register("name")} />
               <FieldError errors={[errors.name]} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field data-invalid={!!errors.targetAmount}>
                 <FieldLabel htmlFor="goal-target">Target amount</FieldLabel>
-                <AmountInput id="goal-target" aria-invalid={!!errors.targetAmount} {...form.register("targetAmount")} />
+                <AmountInput id="goal-target" className="h-12 text-xl font-semibold" aria-invalid={!!errors.targetAmount} {...form.register("targetAmount")} />
                 <FieldError errors={[errors.targetAmount]} />
               </Field>
               <Field data-invalid={!!errors.targetDate}>
@@ -116,14 +113,13 @@ function GoalForm({ accounts, goal, close }: { accounts: AccountRow[]; goal: Sav
             </div>
             <Field data-invalid={!!errors.accountId}>
               <FieldLabel htmlFor="goal-account">Linked account (optional)</FieldLabel>
-              <NativeSelect id="goal-account" aria-invalid={!!errors.accountId} {...form.register("accountId")}>
-                <NativeSelectOption value="">No linked account</NativeSelectOption>
-                {savingsAccounts.map((a) => (
-                  <NativeSelectOption key={a.id} value={a.id}>
-                    {a.name} · {ACCOUNT_TYPE_LABELS[a.account_type]}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+              <Controller
+                control={form.control}
+                name="accountId"
+                render={({ field }) => (
+                  <FormSelect id="goal-account" value={field.value ?? ""} onValueChange={field.onChange} invalid={!!errors.accountId} options={accountOptions(savingsAccounts)} emptyLabel="No linked account" placeholder="No linked account" />
+                )}
+              />
               <FieldDescription>Transfers out of the linked account tagged with this goal count as withdrawals.</FieldDescription>
               <FieldError errors={[errors.accountId]} />
             </Field>
@@ -135,15 +131,26 @@ function GoalForm({ accounts, goal, close }: { accounts: AccountRow[]; goal: Sav
             {goal ? (
               <Field>
                 <FieldLabel htmlFor="goal-status">Status</FieldLabel>
-                <NativeSelect id="goal-status" {...form.register("status")}>
-                  <NativeSelectOption value="active">Active</NativeSelectOption>
-                  <NativeSelectOption value="completed">Completed</NativeSelectOption>
-                  <NativeSelectOption value="archived">Archived</NativeSelectOption>
-                </NativeSelect>
+                <Controller
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormSelect
+                      id="goal-status"
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      options={[
+                        { value: "active", label: "Active", text: "Active", description: "Shown on the dashboard and savings page", icon: <CirclePlay /> },
+                        { value: "completed", label: "Completed", text: "Completed", description: "Target reached", icon: <CheckCircle2 /> },
+                        { value: "archived", label: "Archived", text: "Archived", description: "Hidden from lists", icon: <Archive /> },
+                      ]}
+                    />
+                  )}
+                />
               </Field>
             ) : null}
           </FieldGroup>
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-6 gap-2">
             <Button type="button" variant="outline" onClick={close} disabled={pending}>
               Cancel
             </Button>

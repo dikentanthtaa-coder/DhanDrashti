@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import type { CategoryRow, CategoryType } from "@/lib/types/database";
 import { categorySchema, type CategoryInput } from "@/lib/validation/categories";
 import { createCategoryAction, updateCategoryAction } from "@/lib/actions/categories";
@@ -12,7 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { FormSelect } from "@/components/common/form-select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
 import { CATEGORY_ICON_NAMES, CategoryIcon } from "@/components/common/category-icon";
 import { cn } from "@/lib/utils";
@@ -73,39 +75,68 @@ export function CategoryFormDialog({
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) { form.reset(defaults); setFormError(null); } }}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{category ? "Edit category" : "New category"}</DialogTitle>
           <DialogDescription>Custom categories appear next to the default ones in forms, budgets and reports.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} noValidate aria-busy={pending} className="flex flex-col gap-4">
-          {formError ? <p role="alert" className="text-sm text-destructive">{formError}</p> : null}
-          <FieldGroup>
+        <form onSubmit={onSubmit} noValidate aria-busy={pending} className="flex flex-col gap-5">
+          {formError ? (
+            <Alert variant="destructive">
+              <AlertDescription>{formError}</AlertDescription>
+            </Alert>
+          ) : null}
+          <FieldGroup className="gap-5">
             <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="cat-name">Name</FieldLabel>
-              <Input id="cat-name" autoFocus aria-invalid={!!errors.name} {...form.register("name")} />
+              <Input id="cat-name" autoFocus placeholder="e.g. Chai" aria-invalid={!!errors.name} {...form.register("name")} />
               <FieldError errors={[errors.name]} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field data-invalid={!!errors.type}>
                 <FieldLabel htmlFor="cat-type">Type</FieldLabel>
-                <NativeSelect id="cat-type" disabled={hasChildren} {...form.register("type", { onChange: () => form.setValue("parentId", "") })}>
-                  <NativeSelectOption value="expense">Expense</NativeSelectOption>
-                  <NativeSelectOption value="income">Income</NativeSelectOption>
-                </NativeSelect>
+                <Controller
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormSelect
+                      id="cat-type"
+                      value={field.value}
+                      onValueChange={(v) => {
+                        field.onChange(v);
+                        form.setValue("parentId", "");
+                      }}
+                      disabled={hasChildren}
+                      invalid={!!errors.type}
+                      options={[
+                        { value: "expense", label: "Expense", text: "Expense", icon: <ArrowDownRight className="text-expense" /> },
+                        { value: "income", label: "Income", text: "Income", icon: <ArrowUpRight className="text-income" /> },
+                      ]}
+                    />
+                  )}
+                />
                 {hasChildren ? <FieldDescription>Type is fixed while subcategories exist.</FieldDescription> : null}
                 <FieldError errors={[errors.type]} />
               </Field>
               <Field data-invalid={!!errors.parentId}>
                 <FieldLabel htmlFor="cat-parent">Parent category</FieldLabel>
-                <NativeSelect id="cat-parent" disabled={hasChildren} {...form.register("parentId")}>
-                  <NativeSelectOption value="">None (main category)</NativeSelectOption>
-                  {parentOptions.map((p) => (
-                    <NativeSelectOption key={p.id} value={p.id}>
-                      {p.name}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
+                <Controller
+                  control={form.control}
+                  name="parentId"
+                  render={({ field }) => (
+                    <FormSelect
+                      id="cat-parent"
+                      value={field.value ?? ""}
+                      onValueChange={field.onChange}
+                      disabled={hasChildren}
+                      invalid={!!errors.parentId}
+                      emptyLabel="None (main category)"
+                      placeholder="None (main category)"
+                      options={parentOptions.map((p) => ({ value: p.id, label: p.name, text: p.name, icon: <CategoryIcon icon={p.icon} color={p.color} size="sm" /> }))}
+                    />
+                  )}
+                />
+                <FieldDescription>Nest under a default or custom main category.</FieldDescription>
                 <FieldError errors={[errors.parentId]} />
               </Field>
             </div>
@@ -158,8 +189,12 @@ export function CategoryFormDialog({
               />
               <FieldError errors={[errors.icon]} />
             </Field>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              Preview: <CategoryIcon icon={icon} color={color || null} /> <span className="text-foreground">{form.watch("name") || "Category name"}</span>
+            <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 text-sm">
+              <CategoryIcon icon={icon} color={color || null} size="lg" />
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Preview</span>
+                <span className="font-medium text-foreground">{form.watch("name") || "Category name"}</span>
+              </div>
             </div>
           </FieldGroup>
           <DialogFooter>

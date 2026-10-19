@@ -7,7 +7,7 @@ import { RANGE_PRESETS, resolvePreset, type DateRange, type RangePreset } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { FormSelect } from "@/components/common/form-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { formatDisplayDate } from "@/lib/finance/dates";
 
@@ -58,13 +58,14 @@ export function DateRangeFilter({
       <Label htmlFor="range-preset" className="sr-only">
         Date range
       </Label>
-      <NativeSelect id="range-preset" value={preset} onChange={(e) => onPreset(e.target.value as RangePreset)} className="w-44">
-        {presets.map((p) => (
-          <NativeSelectOption key={p.value} value={p.value}>
-            {p.label}
-          </NativeSelectOption>
-        ))}
-      </NativeSelect>
+      <FormSelect
+        id="range-preset"
+        aria-label="Date range"
+        value={preset}
+        onValueChange={(v) => onPreset(v as RangePreset)}
+        options={presets.map((p) => ({ value: p.value, label: p.label }))}
+        className="w-48"
+      />
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="default" aria-label="Choose custom date range">

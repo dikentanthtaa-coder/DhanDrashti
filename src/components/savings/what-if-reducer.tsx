@@ -4,7 +4,7 @@ import * as React from "react";
 import { savingsIfReduced } from "@/lib/finance/calculations";
 import { formatINR } from "@/lib/finance/money";
 import { Label } from "@/components/ui/label";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { FormSelect } from "@/components/common/form-select";
 
 export function WhatIfReducer({ categories }: { categories: { id: string; name: string; total: number }[] }) {
   const [categoryId, setCategoryId] = React.useState(categories[0]?.id ?? "");
@@ -17,13 +17,12 @@ export function WhatIfReducer({ categories }: { categories: { id: string; name: 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="grid gap-1.5">
           <Label htmlFor="whatif-category">Category</Label>
-          <NativeSelect id="whatif-category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-            {categories.map((c) => (
-              <NativeSelectOption key={c.id} value={c.id}>
-                {c.name} · {formatINR(c.total)}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+          <FormSelect
+            id="whatif-category"
+            value={categoryId}
+            onValueChange={setCategoryId}
+            options={categories.map((c) => ({ value: c.id, label: c.name, text: c.name, description: `${formatINR(c.total)} this month` }))}
+          />
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="whatif-percent">Reduce by {percent}%</Label>
@@ -35,7 +34,7 @@ export function WhatIfReducer({ categories }: { categories: { id: string; name: 
             step={5}
             value={percent}
             onChange={(e) => setPercent(Number(e.target.value))}
-            className="accent-primary"
+            className="h-10 w-full accent-primary"
             aria-valuetext={`${percent} percent`}
           />
         </div>

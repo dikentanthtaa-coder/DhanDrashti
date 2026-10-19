@@ -14,7 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { FormSelect } from "@/components/common/form-select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { accountTypeOptions } from "@/components/transactions/select-options";
 import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/common/amount-input";
 
@@ -60,9 +62,13 @@ export function AccountFormDialog({ account, trigger }: { account?: AccountRow |
           <DialogTitle>{account ? "Edit account" : "New account"}</DialogTitle>
           <DialogDescription>Accounts hold your money. Balances are calculated from the opening balance and every transaction.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} noValidate aria-busy={pending} className="flex flex-col gap-4">
-          {formError ? <p role="alert" className="text-sm text-destructive">{formError}</p> : null}
-          <FieldGroup>
+        <form onSubmit={onSubmit} noValidate aria-busy={pending} className="flex flex-col gap-5">
+          {formError ? (
+            <Alert variant="destructive">
+              <AlertDescription>{formError}</AlertDescription>
+            </Alert>
+          ) : null}
+          <FieldGroup className="gap-5">
             <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="acc-name">Name</FieldLabel>
               <Input id="acc-name" autoFocus placeholder="e.g. HDFC Salary" aria-invalid={!!errors.name} {...form.register("name")} />
@@ -70,13 +76,11 @@ export function AccountFormDialog({ account, trigger }: { account?: AccountRow |
             </Field>
             <Field data-invalid={!!errors.accountType}>
               <FieldLabel htmlFor="acc-type">Type</FieldLabel>
-              <NativeSelect id="acc-type" {...form.register("accountType")}>
-                {ACCOUNT_TYPES.map((t) => (
-                  <NativeSelectOption key={t.value} value={t.value}>
-                    {t.label}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+              <Controller
+                control={form.control}
+                name="accountType"
+                render={({ field }) => <FormSelect id="acc-type" value={field.value} onValueChange={field.onChange} invalid={!!errors.accountType} options={accountTypeOptions(ACCOUNT_TYPES)} />}
+              />
               {typeInfo ? <FieldDescription>{typeInfo.description}</FieldDescription> : null}
               <FieldError errors={[errors.accountType]} />
             </Field>
@@ -86,12 +90,12 @@ export function AccountFormDialog({ account, trigger }: { account?: AccountRow |
               <FieldDescription>{accountType === "credit_card" ? "Enter a negative amount for an existing outstanding balance." : "The balance before any transaction recorded here."}</FieldDescription>
               <FieldError errors={[errors.openingBalance]} />
             </Field>
-            <Field orientation="horizontal">
-              <Controller control={form.control} name="isActive" render={({ field }) => <Switch id="acc-active" checked={!!field.value} onCheckedChange={field.onChange} />} />
-              <div className="flex flex-col gap-0.5">
+            <Field orientation="horizontal" className="rounded-xl border bg-muted/30 p-4">
+              <div className="flex flex-1 flex-col gap-0.5">
                 <FieldLabel htmlFor="acc-active">Active</FieldLabel>
                 <FieldDescription>Inactive accounts are hidden from forms but keep their history.</FieldDescription>
               </div>
+              <Controller control={form.control} name="isActive" render={({ field }) => <Switch id="acc-active" checked={!!field.value} onCheckedChange={field.onChange} />} />
             </Field>
           </FieldGroup>
           <DialogFooter>

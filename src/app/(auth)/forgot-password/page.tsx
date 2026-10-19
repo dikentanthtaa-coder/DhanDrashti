@@ -3,7 +3,11 @@ import type { Metadata } from "next";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
-export const metadata: Metadata = { title: "Forgot password" };
+export const metadata: Metadata = {
+  title: "Forgot password",
+  description: "Reset your DhanDrashti password with a secure email link.",
+  alternates: { canonical: "/forgot-password" },
+};
 
 export default function ForgotPasswordPage() {
   return (

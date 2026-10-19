@@ -7,7 +7,8 @@ import { updateSavingsTargetAction } from "@/lib/actions/savings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { SegmentedChoice } from "@/components/settings/form-helpers";
+import { Ban, IndianRupee, Percent } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 
 export function SavingsTargetForm({ type, value }: { type: SavingsTargetType | null; value: number | null }) {
@@ -30,14 +31,20 @@ export function SavingsTargetForm({ type, value }: { type: SavingsTargetType | n
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-3" aria-busy={pending}>
-      <FieldGroup className="gap-3">
+      <FieldGroup className="gap-4">
         <Field>
-          <FieldLabel htmlFor="target-kind">Monthly savings target</FieldLabel>
-          <NativeSelect id="target-kind" value={kind} onChange={(e) => setKind(e.target.value as typeof kind)}>
-            <NativeSelectOption value="none">No target</NativeSelectOption>
-            <NativeSelectOption value="fixed">Fixed amount (₹ per month)</NativeSelectOption>
-            <NativeSelectOption value="percent">Percentage of monthly income</NativeSelectOption>
-          </NativeSelect>
+          <FieldLabel id="target-kind-label">Monthly savings target</FieldLabel>
+          <SegmentedChoice
+            idPrefix="target-kind"
+            aria-label="Monthly savings target type"
+            value={kind}
+            onChange={setKind}
+            options={[
+              { value: "none", label: "No target", icon: <Ban /> },
+              { value: "fixed", label: "Fixed amount", description: "₹ per month", icon: <IndianRupee /> },
+              { value: "percent", label: "Percent of income", description: "of monthly income", icon: <Percent /> },
+            ]}
+          />
         </Field>
         {kind !== "none" ? (
           <Field data-invalid={!!error}>
@@ -49,7 +56,7 @@ export function SavingsTargetForm({ type, value }: { type: SavingsTargetType | n
                 inputMode="decimal"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className={kind === "fixed" ? "pl-7 tabular" : "pr-8 tabular"}
+                className={kind === "fixed" ? "h-12 pl-7 text-xl font-semibold tabular" : "h-12 pr-8 text-xl font-semibold tabular"}
                 aria-invalid={!!error}
                 placeholder={kind === "fixed" ? "10000" : "20"}
               />
@@ -59,7 +66,7 @@ export function SavingsTargetForm({ type, value }: { type: SavingsTargetType | n
           </Field>
         ) : null}
       </FieldGroup>
-      <Button type="submit" size="sm" className="self-start" disabled={pending}>
+      <Button type="submit" className="self-end" disabled={pending}>
         {pending ? <Spinner /> : null}
         Save target
       </Button>

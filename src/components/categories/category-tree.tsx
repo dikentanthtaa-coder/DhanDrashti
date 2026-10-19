@@ -45,7 +45,7 @@ export function CategoryTree({ categories, type, showArchived }: { categories: C
   };
 
   if (parents.length === 0) {
-    return <p className="text-sm text-muted-foreground">No {type} categories yet.</p>;
+    return <p className="py-6 text-center text-sm text-muted-foreground">No {type} categories yet.</p>;
   }
 
   const renderRow = (cat: CategoryRow, parent: CategoryRow | null) => {
@@ -53,7 +53,7 @@ export function CategoryTree({ categories, type, showArchived }: { categories: C
     const siblings = own ? ownOrdered.filter((c) => c.type === cat.type && (c.parent_id ?? null) === (cat.parent_id ?? null)) : [];
     const idx = siblings.findIndex((c) => c.id === cat.id);
     return (
-      <div className={cn("flex items-center gap-3 py-2", cat.is_archived && "opacity-60")} data-pending={pending || undefined}>
+      <div className={cn("flex items-center gap-3 rounded-lg px-1 py-2.5 transition-colors hover:bg-muted/40", cat.is_archived && "opacity-60")} data-pending={pending || undefined}>
         <CategoryIcon icon={cat.icon ?? parent?.icon} color={cat.color ?? parent?.color} size={parent ? "sm" : "md"} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
