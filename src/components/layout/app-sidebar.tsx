@@ -30,10 +30,10 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                    "group relative flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      ? "border-primary/40 bg-primary/10 text-primary shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)]"
+                      : "border-transparent text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
                   <item.icon className={cn("size-[18px]", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} aria-hidden="true" />
