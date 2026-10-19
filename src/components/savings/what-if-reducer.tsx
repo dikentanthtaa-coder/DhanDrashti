@@ -14,7 +14,7 @@ export function WhatIfReducer({ categories }: { categories: { id: string; name: 
   const saving = savingsIfReduced(selected.total, percent);
   return (
     <div className="flex flex-col gap-3">
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4">
         <div className="grid gap-1.5">
           <Label htmlFor="whatif-category">Category</Label>
           <FormSelect

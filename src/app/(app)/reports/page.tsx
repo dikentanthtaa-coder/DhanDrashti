@@ -58,7 +58,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
         </Alert>
       ) : null}
 
-      <section aria-label="Report metrics" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section aria-label="Report metrics" className="grid gap-4 sm:grid-cols-2 @5xl:grid-cols-4">
         <SummaryCard title="Total income" value={formatINR(t.income)} icon={ArrowUpRight} tone="income" delta={{ value: report.changes.income, label: prevLabel }} />
         <SummaryCard title="Total expenses" value={formatINR(t.netExpense)} icon={ArrowDownRight} tone="expense" delta={{ value: report.changes.expense, label: prevLabel, invert: true }} hint={t.refunds.gt(0) ? `After ${formatINR(t.refunds)} in refunds` : "Net of refunds"} />
         <SummaryCard title="Net cash flow" value={formatINR(t.netCashFlow)} icon={Scale} tone={t.netCashFlow.isNegative() ? "critical" : "neutral"} delta={{ value: report.changes.netCashFlow, label: prevLabel }} />
@@ -77,7 +77,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
       <ReportCharts trend={trend} incomeExpense={incomeExpense} pie={pie} methods={methods} rangeLabel={rangeLabel} />
 
       <CategoryTotalsTable parents={report.parentTotals} leaves={report.categoryTotals} totalExpense={t.netExpense.toNumber()} />
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 @2xl:grid-cols-2">
         <MerchantTotalsTable rows={report.merchantTotals} totalExpense={t.netExpense.toNumber()} />
         <PaymentMethodTotalsTable rows={report.paymentMethodTotals} totalExpense={t.netExpense.toNumber()} />
       </div>

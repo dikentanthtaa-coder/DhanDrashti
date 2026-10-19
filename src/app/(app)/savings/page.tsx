@@ -72,7 +72,7 @@ export default async function SavingsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader title="Savings planner" description={`Plan how much to set aside each month and track progress toward your goals. ${formatMonthLabel(thisMonth.start)}.`} actions={<NewGoalButton accounts={accounts} />} />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 @5xl:grid-cols-4">
         <SummaryCard title="Income this month" value={formatINR(totals.income)} tone="income" icon={ArrowUpRight} />
         <SummaryCard title="Expenses this month" value={formatINR(totals.netExpense)} tone="expense" icon={ArrowDownRight} delta={{ value: expenseChange, label: "vs last month", invert: true }} />
         <SummaryCard
@@ -84,8 +84,8 @@ export default async function SavingsPage() {
         <SummaryCard title="Savings rate" value={rate === null ? "—" : formatPercent(rate, 1)} hint={rate === null ? "No income recorded this month" : "Share of income not spent"} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-1">
+      <div className="grid gap-4 @2xl:grid-cols-2 @4xl:grid-cols-3">
+        <Card className="@4xl:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Target className="size-4" aria-hidden="true" /> Monthly target
@@ -112,7 +112,7 @@ export default async function SavingsPage() {
             <SavingsTargetForm type={profile.savings_target_type} value={profile.savings_target_value} />
           </CardContent>
         </Card>
-        <ChartCard title="Monthly savings trend" description="Income minus expenses for the last six months" className="lg:col-span-2">
+        <ChartCard title="Monthly savings trend" description="Income minus expenses for the last six months" className="@4xl:col-span-2">
           <SavingsTrendChart data={trend} target={target ? target.toNumber() : null} />
         </ChartCard>
       </div>
@@ -124,7 +124,7 @@ export default async function SavingsPage() {
         {goals.length === 0 ? (
           <EmptyState icon={PiggyBank} title="No savings goals yet" description="Create a goal like an emergency fund or a trip. Contributions are transfers between your accounts, so they never count as spending." action={<NewGoalButton accounts={accounts} />} />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 @4xl:grid-cols-3">
             {goals.map((g) => (
               <SavingsGoalCard key={g.id} goal={g} accounts={accounts} today={today} />
             ))}
@@ -137,7 +137,7 @@ export default async function SavingsPage() {
           <Lightbulb className="size-5" aria-hidden="true" /> Recommendations
         </h2>
         <p className="text-sm text-muted-foreground">Based only on your recorded transactions and budgets. These are estimates — no guaranteed savings or returns.</p>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4 @2xl:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Largest spending categories</CardTitle>

@@ -33,7 +33,7 @@ function TotalsTable({ rows, total, nameHeader }: { rows: { key: string; name: R
 
 export function CategoryTotalsTable({ parents, leaves, totalExpense }: { parents: CategoryTotal[]; leaves: CategoryTotal[]; totalExpense: number }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid gap-4 @2xl:grid-cols-2">
       <Card className="gap-3">
         <CardHeader>
           <CardTitle className="text-base">Category totals</CardTitle>

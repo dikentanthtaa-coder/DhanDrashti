@@ -49,7 +49,7 @@ export function AccountList({ accounts, balances }: { accounts: AccountRow[]; ba
               </h2>
               <span className="tabular text-sm text-muted-foreground">{type === "credit_card" && total < 0 ? `Owed ${formatINR(-total)}` : formatINR(total)}</span>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 @4xl:grid-cols-3">
               {items.map((a) => {
                 const bal = balanceOf.get(a.id) ?? 0;
                 const owed = type === "credit_card" && bal < 0;

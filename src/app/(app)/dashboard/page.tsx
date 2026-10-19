@@ -135,7 +135,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <DateRangeFilter preset={preset} range={range} today={today} />
       </div>
 
-      <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 @5xl:grid-cols-4">
         <SummaryCard title="Today's expenses" value={formatINR(todayT.netExpense)} icon={ArrowDownRight} tone="expense" hint="Net of refunds" />
         <SummaryCard title="Today's income" value={formatINR(todayT.income)} icon={ArrowUpRight} tone="income" />
         <SummaryCard title="Expenses · selected period" value={formatINR(cur.netExpense)} icon={ArrowDownRight} tone="expense" delta={expenseDelta} hint={rangeLabel} />
@@ -174,7 +174,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           value={formatINR(sum(balances.filter((b) => b.is_active).map((b) => b.balance)))}
           icon={Landmark}
           hint="All active account balances, credit cards subtracted"
-          className="sm:col-span-2 xl:col-span-1"
+          className="sm:col-span-2 @4xl:col-span-1"
         />
       </section>
 
@@ -182,12 +182,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       <DashboardCharts data={chartData} />
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @2xl:grid-cols-2 @4xl:grid-cols-3">
         <RecentTransactions transactions={recent} categories={categories} accounts={accounts} />
         <TopCategories totals={parents} totalExpense={cur.netExpense.toNumber()} />
         <BudgetAlertsWidget usage={budgets} notifications={unread} />
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 @2xl:grid-cols-2">
         <UpcomingRecurring items={upcoming} today={today} />
         <SavingsGoalsWidget goals={goals} />
       </div>

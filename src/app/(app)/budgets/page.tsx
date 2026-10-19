@@ -75,7 +75,7 @@ export default async function BudgetsPage({ searchParams }: { searchParams: Prom
           action={<NewBudgetButton categories={categories} defaultMonth={monthParam} />}
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 @4xl:grid-cols-3">
           {usage.map((u, i) => (
             <BudgetProgressCard key={u.budget_id} usage={u} budget={budgetById.get(u.budget_id) ?? null} history={histories[i]} categories={categories} defaultMonth={monthParam} />
           ))}

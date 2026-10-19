@@ -80,7 +80,7 @@ export function ReportFilters({ filters, categories, accounts }: { filters: Filt
               </Button>
             ) : null}
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 @2xl:grid-cols-2 @4xl:grid-cols-3 @5xl:grid-cols-6">
             <div className="grid gap-1.5">
               <Label htmlFor="f-type" className="text-xs text-muted-foreground">
                 Type

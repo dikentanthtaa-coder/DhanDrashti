@@ -24,15 +24,15 @@ export interface DashboardChartData {
 export function DashboardCharts({ data }: { data: DashboardChartData }) {
   return (
     <>
-      <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Daily expense trend" description={data.rangeLabel} className="lg:col-span-2">
+      <div className="grid gap-4 @2xl:grid-cols-2 @4xl:grid-cols-3">
+        <ChartCard title="Daily expense trend" description={data.rangeLabel} className="@4xl:col-span-2">
           <SpendingTrendChart data={data.trend} />
         </ChartCard>
         <ChartCard title="Expenses by category" description="Net of refunds · top 7 + other">
           <ExpensePieChart data={data.pie} height={220} />
         </ChartCard>
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 @2xl:grid-cols-2">
         <ChartCard title="Income vs expenses" description={data.incomeExpenseGranularity === "month" ? "By month" : "By day"}>
           <IncomeExpenseChart data={data.incomeExpense} />
         </ChartCard>
@@ -40,7 +40,7 @@ export function DashboardCharts({ data }: { data: DashboardChartData }) {
           <MonthlyComparisonChart data={data.monthly} />
         </ChartCard>
       </div>
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 @2xl:grid-cols-2 @4xl:grid-cols-3">
         <ChartCard title="Budget utilisation" description="This month · 100% line marks each limit">
           <BudgetUtilizationChart data={data.budgets} />
         </ChartCard>
