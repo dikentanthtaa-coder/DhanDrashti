@@ -5,7 +5,7 @@
       <stop offset="1" stop-color="#047857"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" fill="url(#g)"/>
+  <rect width="512" height="512" rx="112.64" fill="url(#g)"/>
   <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="286.72" fill="#ffffff">₹</text>
   <rect x="153.6" y="399.36" width="204.8" height="23.04" rx="10.24" fill="#a7f3d0"/>
 </svg>

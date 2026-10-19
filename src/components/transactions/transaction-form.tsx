@@ -178,14 +178,18 @@ export function TransactionForm({ accounts, categories, goals, merchants, today,
             onClick={() => setType(opt.value)}
             disabled={pending}
             className={cn(
-              "flex flex-col items-center gap-0.5 rounded-lg border border-transparent px-2 py-2.5 text-sm font-medium text-muted-foreground transition-colors outline-none hover:bg-background/70 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:flex-row sm:justify-center sm:gap-2",
+              "flex min-w-0 items-center justify-center gap-2.5 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors outline-none hover:bg-background/70 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
               "data-[active=true]:bg-background data-[active=true]:shadow-xs",
               opt.className
             )}
           >
-            <opt.icon className="size-4" aria-hidden="true" />
-            <span>{opt.label}</span>
-            <span className="hidden text-xs font-normal text-muted-foreground lg:inline">· {opt.hint}</span>
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted/60 data-[active=true]:bg-current/10" data-active={type === opt.value}>
+              <opt.icon className="size-4" aria-hidden="true" />
+            </span>
+            <span className="flex min-w-0 flex-col items-start leading-tight">
+              <span className="truncate">{opt.label}</span>
+              <span className="hidden truncate text-[11px] font-normal text-muted-foreground sm:block">{opt.hint}</span>
+            </span>
           </button>
         ))}
       </div>

@@ -125,8 +125,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title={`Hello, ${firstName}`}
-        description={`Here's your money at a glance · ${formatDisplayDate(today, "EEEE, d MMMM yyyy")}`}
+        title="Dashboard"
+        description={`Hello, ${firstName} · ${formatDisplayDate(today, "EEEE, d MMMM yyyy")}`}
         actions={<QuickAddExpense accounts={accounts} categories={categories} today={today} />}
       />
 

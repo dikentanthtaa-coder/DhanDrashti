@@ -30,7 +30,10 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, statusBarStyle: "default", title: APP_NAME },
   formatDetection: { telephone: false },
   icons: {
-    icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    icon: [
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", sizes: "96x96", type: "image/png" },
+    ],
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
   },
   robots: { index: true, follow: true },

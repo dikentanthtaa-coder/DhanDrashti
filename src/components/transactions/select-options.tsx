@@ -32,7 +32,10 @@ export function accountOptions(accounts: AccountRow[], options?: { withType?: bo
       value: a.id,
       label: a.name,
       text: a.name,
-      description: options?.withType === false ? undefined : ACCOUNT_TYPE_LABELS[a.account_type],
+      description:
+        options?.withType === false || a.name.trim().toLowerCase() === ACCOUNT_TYPE_LABELS[a.account_type].toLowerCase()
+          ? undefined
+          : ACCOUNT_TYPE_LABELS[a.account_type],
       icon: <Icon className="text-muted-foreground" />,
     };
   });

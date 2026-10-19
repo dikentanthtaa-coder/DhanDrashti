@@ -8,7 +8,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
  * reveal black or white corners. The glyph sits inside the maskable safe zone
  * (central 80%) so it is never clipped.
  */
-const svg = (size, maskable = false) => {
+const svg = (size, maskable = false, rounded = false) => {
   const glyph = maskable ? size * 0.46 : size * 0.56;
   const barW = maskable ? size * 0.32 : size * 0.4;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
@@ -18,7 +18,7 @@ const svg = (size, maskable = false) => {
       <stop offset="1" stop-color="#047857"/>
     </linearGradient>
   </defs>
-  <rect width="${size}" height="${size}" fill="url(#g)"/>
+  <rect width="${size}" height="${size}" rx="${rounded ? size * 0.22 : 0}" fill="url(#g)"/>
   <text x="50%" y="${maskable ? "53%" : "54%"}" text-anchor="middle" dominant-baseline="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="${glyph}" fill="#ffffff">₹</text>
   <rect x="${(size - barW) / 2}" y="${size * (maskable ? 0.74 : 0.78)}" width="${barW}" height="${size * 0.045}" rx="${size * 0.02}" fill="#a7f3d0"/>
 </svg>`;
@@ -35,7 +35,6 @@ const jobs = [
 for (const [name, size, maskable] of jobs) {
   await sharp(Buffer.from(svg(size, maskable))).png().toFile(`public/icons/${name}`);
 }
-writeFileSync("public/icons/icon.svg", svg(512));
-await sharp(Buffer.from(svg(32))).png().toFile("src/app/favicon.ico".replace(".ico", ".png"));
-await sharp(Buffer.from(svg(64))).png().toFile("src/app/icon.png");
+writeFileSync("public/icons/icon.svg", svg(512, false, true));
+await sharp(Buffer.from(svg(96, false, true))).png().toFile("src/app/icon.png");
 console.log("icons generated");
