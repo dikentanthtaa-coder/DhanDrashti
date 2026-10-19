@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // generated service worker + playwright output
+    "public/sw.js",
+    "public/sw.js.map",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 

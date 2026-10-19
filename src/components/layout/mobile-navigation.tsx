@@ -15,8 +15,6 @@ export function MobileNavigation({ unreadCount = 0 }: { unreadCount?: number }) 
   const [open, setOpen] = React.useState(false);
   const primary = NAV_ITEMS.filter((i) => i.mobile);
 
-  React.useEffect(() => setOpen(false), [pathname]);
-
   return (
     <nav
       className="no-print fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur safe-bottom lg:hidden"
@@ -65,6 +63,7 @@ export function MobileNavigation({ unreadCount = 0 }: { unreadCount?: number }) 
                       <Link
                         href={item.href}
                         aria-current={active ? "page" : undefined}
+                        onClick={() => setOpen(false)}
                         className={cn(
                           "flex items-center gap-2 rounded-lg border px-3 py-3 text-sm font-medium",
                           active ? "border-primary bg-primary/10" : "hover:bg-muted"

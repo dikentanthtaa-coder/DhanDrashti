@@ -21,6 +21,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/**
+ * Every page is rendered per request so the CSP nonce generated in src/proxy.ts
+ * is applied to all scripts (statically prerendered HTML cannot carry a nonce).
+ * Private pages are dynamic anyway; the few public pages are cheap to render.
+ */
+export const dynamic = "force-dynamic";
+
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
