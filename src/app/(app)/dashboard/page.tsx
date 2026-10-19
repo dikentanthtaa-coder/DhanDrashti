@@ -140,7 +140,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <DateRangeFilter preset={preset} range={range} today={today} />
       </div>
 
-      <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 @5xl:grid-cols-4">
+      <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 @3xl:grid-cols-3 @7xl:grid-cols-4">
         <SummaryCard title="Today's expenses" value={formatINR(todayT.netExpense)} icon={ArrowDownRight} tone="expense" hint="Net of refunds" />
         <SummaryCard title="Today's income" value={formatINR(todayT.income)} icon={ArrowUpRight} tone="income" />
         <SummaryCard title="Expenses · selected period" value={formatINR(cur.netExpense)} icon={ArrowDownRight} tone="expense" delta={expenseDelta} sparkline={expenseSpark} />

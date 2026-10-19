@@ -55,27 +55,31 @@ export function SummaryCard({
           </span>
         ) : null}
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm text-muted-foreground">{title}</div>
-          <div className="mt-1 truncate text-[1.65rem] leading-tight font-semibold tracking-tight">{value}</div>
-          {delta ? <DeltaLine delta={delta} /> : hint ? <div className="mt-1.5 text-xs text-muted-foreground">{hint}</div> : null}
-          {delta && hint ? <div className="mt-0.5 text-xs text-muted-foreground">{hint}</div> : null}
-        </div>
-        {sparkline && sparkline.length > 1 ? (
-          <div className="self-end text-muted-foreground">
-            <Sparkline id={id} data={sparkline} stroke={LINE[tone]} />
+          <div className="line-clamp-2 text-sm leading-snug text-muted-foreground">{title}</div>
+          <div className="tabular mt-1 text-[1.6rem] leading-tight font-semibold tracking-tight break-words">{value}</div>
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              {delta ? <DeltaLine delta={delta} /> : null}
+              {hint ? <div className={cn("text-xs text-muted-foreground", delta && "mt-0.5")}>{hint}</div> : null}
+            </div>
+            {sparkline && sparkline.length > 1 ? (
+              <div className="shrink-0 text-muted-foreground">
+                <Sparkline id={id} data={sparkline} stroke={LINE[tone]} width={84} height={34} />
+              </div>
+            ) : null}
           </div>
-        ) : null}
+        </div>
       </CardContent>
     </Card>
   );
 }
 
 function DeltaLine({ delta }: { delta: { value: number | null; label: string; invert?: boolean } }) {
-  if (delta.value === null) return <div className="mt-1.5 text-xs text-muted-foreground">No comparison data</div>;
+  if (delta.value === null) return <div className="text-xs text-muted-foreground">No comparison data</div>;
   const good = delta.invert ? delta.value <= 0 : delta.value >= 0;
   const Arrow = delta.value >= 0 ? ArrowUpRight : ArrowDownRight;
   return (
-    <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-xs">
+    <div className="flex flex-wrap items-center gap-x-1.5 text-xs">
       <span className={cn("tabular inline-flex items-center gap-0.5 font-semibold", good ? "text-status-good" : "text-status-critical")}>
         <Arrow className="size-3.5" aria-hidden="true" />
         {Math.abs(delta.value).toFixed(1)}%
