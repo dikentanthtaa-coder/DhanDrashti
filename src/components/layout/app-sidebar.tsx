@@ -35,7 +35,7 @@ export function AppSidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                   className={cn(
                     "group relative flex items-center gap-5 overflow-hidden rounded-md py-2.5 pr-4 pl-5 text-[15px] font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active
-                      ? "bg-primary/10 text-primary before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-primary"
+                      ? "bg-gradient-to-r from-primary/30 via-primary/15 to-primary/0 text-primary before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-primary"
                       : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
