@@ -7,8 +7,8 @@ describe("SummaryCard", () => {
   it("renders INR values with deltas", () => {
     render(<SummaryCard title="This Month's Expenses" value={formatINR(12500)} tone="expense" delta={{ value: 12.5, label: "vs previous month", invert: true }} />);
     expect(screen.getByText("₹12,500.00")).toBeInTheDocument();
-    expect(screen.getByText("+12.5%")).toBeInTheDocument();
-    expect(screen.getByText("+12.5%")).toHaveClass("text-status-critical");
+    expect(screen.getByText("12.5%")).toBeInTheDocument();
+    expect(screen.getByText("12.5%")).toHaveClass("text-status-critical");
   });
 
   it("explains missing comparison data instead of fabricating it", () => {

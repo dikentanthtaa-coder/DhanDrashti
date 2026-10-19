@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowDownRight, ArrowUpRight, Landmark, PiggyBank, Scale, Target, Wallet, TrendingUp } from "lucide-react";
 import { requireUserWithProfile } from "@/lib/auth/session";
-import { todayInTimezone, previousRange, formatDisplayDate, monthStart, monthEnd, addMonthsToDateString } from "@/lib/finance/dates";
+import { todayInTimezone, previousRange, formatDisplayDate, monthStart, monthEnd, addMonthsToDateString, eachDayInRange } from "@/lib/finance/dates";
 import { rangeFromSearchParams } from "@/lib/finance/range-params";
 import { getCategoryTotals, getDailyTotals, getMonthlyTotals, getPaymentMethodTotals, getPeriodSummary, rollupToParents } from "@/lib/data/reports";
 import { getBudgetUsage } from "@/lib/data/budgets";
@@ -119,6 +119,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   });
 
   const firstName = profile.display_name.split(" ")[0] || "there";
+  const byDay = new Map(daily.map((d) => [d.day, d]));
+  const days = eachDayInRange(range);
+  const expenseSpark = days.map((d) => Number(byDay.get(d)?.expense ?? 0));
+  const incomeSpark = days.map((d) => Number(byDay.get(d)?.income ?? 0));
+  const cashSpark = days.map((d) => Number(byDay.get(d)?.income ?? 0) - Number(byDay.get(d)?.expense ?? 0));
   const expenseDelta = { value: percentChange(cur.netExpense, prevT.netExpense), label: "vs previous period", invert: true };
   const incomeDelta = { value: percentChange(cur.income, prevT.income), label: "vs previous period" };
 
@@ -138,12 +143,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 @5xl:grid-cols-4">
         <SummaryCard title="Today's expenses" value={formatINR(todayT.netExpense)} icon={ArrowDownRight} tone="expense" hint="Net of refunds" />
         <SummaryCard title="Today's income" value={formatINR(todayT.income)} icon={ArrowUpRight} tone="income" />
-        <SummaryCard title="Expenses · selected period" value={formatINR(cur.netExpense)} icon={ArrowDownRight} tone="expense" delta={expenseDelta} hint={rangeLabel} />
-        <SummaryCard title="Income · selected period" value={formatINR(cur.income)} icon={ArrowUpRight} tone="income" delta={incomeDelta} hint={rangeLabel} />
+        <SummaryCard title="Expenses · selected period" value={formatINR(cur.netExpense)} icon={ArrowDownRight} tone="expense" delta={expenseDelta} sparkline={expenseSpark} />
+        <SummaryCard title="Income · selected period" value={formatINR(cur.income)} icon={ArrowUpRight} tone="income" delta={incomeDelta} sparkline={incomeSpark} />
         <SummaryCard
           title="Net cash flow"
           value={formatINR(cur.netCashFlow)}
           icon={Scale}
+          sparkline={cashSpark}
           tone={cur.netCashFlow.isNegative() ? "critical" : "neutral"}
           hint="Income minus expenses (transfers excluded)"
         />

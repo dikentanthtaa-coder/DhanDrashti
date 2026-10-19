@@ -59,9 +59,9 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
       ) : null}
 
       <section aria-label="Report metrics" className="grid gap-4 sm:grid-cols-2 @5xl:grid-cols-4">
-        <SummaryCard title="Total income" value={formatINR(t.income)} icon={ArrowUpRight} tone="income" delta={{ value: report.changes.income, label: prevLabel }} />
-        <SummaryCard title="Total expenses" value={formatINR(t.netExpense)} icon={ArrowDownRight} tone="expense" delta={{ value: report.changes.expense, label: prevLabel, invert: true }} hint={t.refunds.gt(0) ? `After ${formatINR(t.refunds)} in refunds` : "Net of refunds"} />
-        <SummaryCard title="Net cash flow" value={formatINR(t.netCashFlow)} icon={Scale} tone={t.netCashFlow.isNegative() ? "critical" : "neutral"} delta={{ value: report.changes.netCashFlow, label: prevLabel }} />
+        <SummaryCard title="Total income" value={formatINR(t.income)} icon={ArrowUpRight} tone="income" delta={{ value: report.changes.income, label: prevLabel }} sparkline={report.daily.map((d) => Number(d.income))} />
+        <SummaryCard title="Total expenses" value={formatINR(t.netExpense)} icon={ArrowDownRight} tone="expense" delta={{ value: report.changes.expense, label: prevLabel, invert: true }} hint={t.refunds.gt(0) ? `After ${formatINR(t.refunds)} in refunds` : "Net of refunds"} sparkline={report.daily.map((d) => Number(d.expense))} />
+        <SummaryCard title="Net cash flow" value={formatINR(t.netCashFlow)} icon={Scale} tone={t.netCashFlow.isNegative() ? "critical" : "neutral"} delta={{ value: report.changes.netCashFlow, label: prevLabel }} sparkline={report.daily.map((d) => Number(d.income) - Number(d.expense))} />
         <SummaryCard title="Savings rate" value={report.savingsRate === null ? "—" : `${report.savingsRate.toFixed(1)}%`} icon={TrendingUp} tone={report.savingsRate === null ? "neutral" : report.savingsRate < 0 ? "critical" : "income"} hint={report.savingsRate === null ? "No income in this period" : "(income − expenses) ÷ income"} />
         <SummaryCard title="Average daily expense" value={formatINR(report.averageDaily)} icon={CalendarDays} hint={`Across ${report.days} day${report.days === 1 ? "" : "s"}`} />
         <SummaryCard
