@@ -90,7 +90,7 @@ export function SegmentedChoice<T extends string>({
       onValueChange={(v) => onChange(v as T)}
       disabled={disabled}
       aria-label={ariaLabel}
-      className={cn("grid gap-2", cols === 1 ? "grid-cols-1" : "grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]")}
+      className={cn("grid gap-2", cols === 1 ? "grid-cols-1" : "grid-cols-[repeat(auto-fit,minmax(12.5rem,1fr))]")}
     >
       {options.map((o) => {
         const id = `${idPrefix}-${o.value}`;
@@ -100,12 +100,12 @@ export function SegmentedChoice<T extends string>({
             key={o.value}
             htmlFor={id}
             className={cn(
-              "flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border bg-background px-3 py-2.5 text-sm transition-colors hover:border-ring/60 has-focus-visible:ring-3 has-focus-visible:ring-primary/25",
+              "relative flex min-w-0 cursor-pointer items-center gap-3 rounded-xl border bg-background px-3 py-2.5 text-sm transition-colors hover:border-ring/60 has-focus-visible:ring-3 has-focus-visible:ring-primary/25",
               active ? (o.activeClassName ?? "border-primary bg-primary/10") : "border-input",
               disabled && "cursor-not-allowed opacity-60"
             )}
           >
-            <RadioGroupItem id={id} value={o.value} className="sr-only" />
+            <RadioGroupItem id={id} value={o.value} className="pointer-events-none absolute top-0 left-0 size-px! border-0 opacity-0 after:hidden" />
             {o.icon ? (
               <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4", active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>
                 {o.icon}
